@@ -3,7 +3,7 @@ import UIKit
 
 final class TrackersViewController: UIViewController {
     
-    // MARK: - Private Properties
+    //MARK: - Properties
     private struct CollectionParams {
         let cellCount: Int
         let height: CGFloat
@@ -27,18 +27,12 @@ final class TrackersViewController: UIViewController {
         rightInset: -16,
         cellSpacing: 9
     )
-    private lazy var dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd.MMMM.yy"
-        return formatter
-    }()
+    
     private var categories: [TrackerCategory] = []
     private var completedTrackers: [TrackerRecord] = []
     private var visibleCategories: [TrackerCategory] = []
     private var currentDate = Date()
     private var dataManager = DataManager.mocksTrackers
-    
-    //MARK: - UI
     
     private lazy var stubImageView: UIImageView = {
         let image = UIImage(named: "stub")
@@ -97,7 +91,7 @@ final class TrackersViewController: UIViewController {
         dpicker.addTarget(self, action: #selector(datePickerValueChanged), for: .valueChanged)
         dpicker.translatesAutoresizingMaskIntoConstraints = false
         dpicker.heightAnchor.constraint(equalToConstant: 34).isActive = true
-        dpicker.widthAnchor.constraint(equalToConstant: 95).isActive = true
+        dpicker.widthAnchor.constraint(equalToConstant: 97).isActive = true
         return dpicker
     }()
     
@@ -112,20 +106,21 @@ final class TrackersViewController: UIViewController {
     // MARK: - Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
-//        self.addTapGestureToHideKeyboard()
+        
+        view.backgroundColor = .ypWhite
         trackersCollectionView.delegate = self
         trackersCollectionView.dataSource = self
-        view.backgroundColor = .ypWhite
         addElements()
         createNavigationBar()
         setupConstraints()
         reloadData()
         conditionStubs()
+        reloadPlaceholder()
     }
     
     // MARK: - Private Function
     private func conditionStubs() {
-        if visibleCategories.isEmpty {
+        if categories.isEmpty {
             trackersCollectionView.isHidden = true
             stubLabel.isHidden = false
             stubImageView.isHidden = false
@@ -151,31 +146,30 @@ final class TrackersViewController: UIViewController {
     }
     
     private func setupConstraints() {
-        var constraints = [NSLayoutConstraint]()
-        
-        constraints.append(trackersCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: collectionParams.leftInset))
-        constraints.append(trackersCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: collectionParams.rightInset))
-        constraints.append(trackersCollectionView.topAnchor.constraint(equalTo: searchTextField.bottomAnchor, constant: 34))
-        constraints.append(trackersCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor))
-        
-        constraints.append(stubImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor))
-        constraints.append(stubImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor))
-        
-        constraints.append(notFoundImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor))
-        constraints.append(notFoundImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor))
-        
-        constraints.append(stubLabel.centerXAnchor.constraint(equalTo: stubImageView.centerXAnchor))
-        constraints.append(stubLabel.topAnchor.constraint(equalTo: stubImageView.bottomAnchor, constant: 8))
-        
-        constraints.append(notFoundLabel.centerXAnchor.constraint(equalTo: notFoundImageView.centerXAnchor))
-        constraints.append(notFoundLabel.topAnchor.constraint(equalTo: notFoundImageView.bottomAnchor, constant: 8))
-        
-        constraints.append(searchTextField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor))
-        constraints.append(searchTextField.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16))
-        constraints.append(searchTextField.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16))
-        constraints.append(searchTextField.heightAnchor.constraint(equalToConstant: 36))
-        
-        NSLayoutConstraint.activate(constraints)
+        NSLayoutConstraint.activate([
+            
+            trackersCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: collectionParams.leftInset),
+            trackersCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: collectionParams.rightInset),
+            trackersCollectionView.topAnchor.constraint(equalTo: searchTextField.bottomAnchor, constant: 34),
+            trackersCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            
+            stubImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            stubImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            
+            notFoundImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            notFoundImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            
+            stubLabel.centerXAnchor.constraint(equalTo: stubImageView.centerXAnchor),
+            stubLabel.topAnchor.constraint(equalTo: stubImageView.bottomAnchor, constant: 8),
+            
+            notFoundLabel.centerXAnchor.constraint(equalTo: notFoundImageView.centerXAnchor),
+            notFoundLabel.topAnchor.constraint(equalTo: notFoundImageView.bottomAnchor, constant: 8),
+            
+            searchTextField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            searchTextField.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
+            searchTextField.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
+            searchTextField.heightAnchor.constraint(equalToConstant: 36)
+        ])
     }
     
     private func addElements(){
@@ -200,7 +194,7 @@ final class TrackersViewController: UIViewController {
             style: .plain,
             target: self,
             action: #selector(self.addTask)
-            )
+        )
         leftButton.tintColor = .ypBlack
         navigationItem.leftBarButtonItem = leftButton
         
@@ -221,7 +215,7 @@ final class TrackersViewController: UIViewController {
     
     private func isSameTracker(trackerRecord: TrackerRecord, id: UUID) -> Bool {
         let isSameDay = Calendar.current.isDate(trackerRecord.date, inSameDayAs: currentDate)
-           return trackerRecord.id == id && isSameDay
+        return trackerRecord.id == id && isSameDay
     }
     
     private func reloadVisibleCategories(text: String?, date: Date) {
@@ -231,7 +225,7 @@ final class TrackersViewController: UIViewController {
         visibleCategories = categories.compactMap { category in
             let trackers = category.trackers.filter { tracker in
                 let textCondition = filterText.isEmpty ||
-                    tracker.name.lowercased().contains(filterText)
+                tracker.name.lowercased().contains(filterText)
                 let dateCondition = tracker.schedule.contains { weekday in
                     weekday?.numberValue == filterWeekday
                 } == true
@@ -249,18 +243,18 @@ final class TrackersViewController: UIViewController {
         reloadPlaceholder()
     }
     
+    // MARK: - @objc Function
     @objc private func datePickerValueChanged() {
         currentDate = datePicker.date
         reloadVisibleCategories(text: searchTextField.text, date: currentDate)
     }
-            
+    
     @objc private func addTask() {
         let createTrackerVC = CreateTrackerViewController()
-        //createTrackerVC.updateDelegate = self
+        createTrackerVC.delegate = self
         let navVC = UINavigationController(rootViewController: createTrackerVC)
         present(navVC, animated: true)
     }
-    
 }
 // MARK: - Extension UICollectionViewDataSource
 extension TrackersViewController: UICollectionViewDataSource {
@@ -292,7 +286,7 @@ extension TrackersViewController: UICollectionViewDataSource {
     }
 }
 
-// MARK: - UICollectionViewDelegate
+// MARK: - Extension UICollectionViewDelegate
 extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: (collectionView.bounds.width - collectionParams.cellSpacing) / CGFloat(collectionParams.cellCount),
@@ -308,7 +302,7 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     }
 }
 
-// MARK: - UUITextFieldDelegate
+// MARK: - Extension UUITextFieldDelegate
 extension TrackersViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
@@ -317,7 +311,7 @@ extension TrackersViewController: UITextFieldDelegate {
     }
 }
 
-// MARK: - TrackerCellDelegate
+// MARK: - Extension TrackerCellDelegate
 extension TrackersViewController: TrackerCellDelegate {
     func completeTracker(id: UUID, at indexPath: IndexPath) {
         let isCompletedToday = isCompletedToday(id: id)
@@ -330,6 +324,21 @@ extension TrackersViewController: TrackerCellDelegate {
             completedTrackers.append(trackerRecord)
         }
         trackersCollectionView.reloadItems(at: [indexPath])
+    }
+}
+
+// MARK: - Extension CreateTrackerViewControllerDelegate
+extension TrackersViewController: CreateTrackerViewControllerDelegate {
+    func updateListOfTrackers(newTracker: TrackerCategory) {
+        let getExistCategory = categories.filter { $0.title == newTracker.title }
+        var updateCategory = [newTracker]
+        if !getExistCategory.isEmpty {
+            updateCategory = [TrackerCategory(title: newTracker.title, trackers: getExistCategory[0].trackers + newTracker.trackers)]
+        }
+        let lastCategories = categories.filter { $0.title != newTracker.title }
+        self.categories = lastCategories + updateCategory
+        
+        reloadVisibleCategories(text: "", date: currentDate)
     }
 }
 

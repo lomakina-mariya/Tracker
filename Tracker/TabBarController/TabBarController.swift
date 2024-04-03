@@ -17,7 +17,5 @@ final class TabBarController: UITabBarController {
         statisticsViewController.tabBarItem.image = UIImage(named: "tab_statistics_not_active")
         return UINavigationController(rootViewController: statisticsViewController)
     }
-    
-
 }
 

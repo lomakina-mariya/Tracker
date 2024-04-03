@@ -9,7 +9,6 @@ protocol TrackerCellDelegate: AnyObject {
 final class TrackerCell: UICollectionViewCell {
     
     //MARK: - Properties
-    
     private let mainView: UIView = {
         let view = UIView()
         view.layer.cornerRadius = 16
@@ -41,7 +40,7 @@ final class TrackerCell: UICollectionViewCell {
     private  lazy var plusButton: UIButton = {
         let button = UIButton(type: .system)
         let pointSize = UIImage.SymbolConfiguration(pointSize: 11)
-        let image = UIImage(systemName: "plus", withConfiguration: pointSize) //УБРАТЬ???
+        let image = UIImage(systemName: "plus", withConfiguration: pointSize)
         button.setImage(image, for: .normal)
         button.tintColor = .ypWhite
         button.clipsToBounds = true
@@ -75,8 +74,7 @@ final class TrackerCell: UICollectionViewCell {
     
     weak var delegate: TrackerCellDelegate?
     
-    //MARK: - Helpers
-    
+    //MARK: - Helper
     func configure(with tracker: Tracker, isCompletedToday: Bool, completedDays: Int, indexPath: IndexPath) {
         self.trackerId = tracker.id
         self.isCompletedToday = isCompletedToday
@@ -96,6 +94,7 @@ final class TrackerCell: UICollectionViewCell {
         counterLabel.text = pluralizeDays(completedDays)
     }
     
+    //MARK: - Private Function
     private func addElements() {
         contentView.addSubview(mainView)
         contentView.addSubview(taskTitleLabel)
@@ -114,7 +113,6 @@ final class TrackerCell: UICollectionViewCell {
             taskTitleLabel.bottomAnchor.constraint(equalTo: mainView.bottomAnchor, constant: -12),
             taskTitleLabel.leadingAnchor.constraint(equalTo: mainView.leadingAnchor, constant: 12),
             taskTitleLabel.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -12),
-            //taskTitleLabel.heightAnchor.constraint(equalToConstant: 34),
             
             emojiLabel.topAnchor.constraint(equalTo: mainView.topAnchor, constant: 12),
             emojiLabel.leadingAnchor.constraint(equalTo: mainView.leadingAnchor, constant: 12),
@@ -146,8 +144,8 @@ final class TrackerCell: UICollectionViewCell {
         }
     }
     
-    @objc
-    private func plusButtonTapped() {
+    //MARK: - @objc Function
+    @objc private func plusButtonTapped() {
         guard let trackerId = trackerId,
               let indexPath = indexPath
         else {
