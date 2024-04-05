@@ -11,6 +11,7 @@
 		5D267B482BBB701A0011457C /* ScheduleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D267B472BBB701A0011457C /* ScheduleViewController.swift */; };
 		5D267B4C2BBC699B0011457C /* TrackerPropertiesCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D267B4B2BBC699B0011457C /* TrackerPropertiesCell.swift */; };
 		5D7AC1792BBF89E8001027D9 /* IntForDays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D7AC1782BBF89E8001027D9 /* IntForDays.swift */; };
+		5D7AC17B2BC09884001027D9 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D7AC17A2BC09884001027D9 /* ViewController.swift */; };
 		5DC39B9B2BA770F500F6CDB7 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DC39B9A2BA770F500F6CDB7 /* TabBarController.swift */; };
 		5DC39B9D2BA771F000F6CDB7 /* StatisticsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DC39B9C2BA771F000F6CDB7 /* StatisticsViewController.swift */; };
 		5DC39C0E2BB5F8EE00F6CDB7 /* Tracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DC39C0D2BB5F8EE00F6CDB7 /* Tracker.swift */; };
@@ -34,6 +35,7 @@
 		5D267B472BBB701A0011457C /* ScheduleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleViewController.swift; sourceTree = "<group>"; };
 		5D267B4B2BBC699B0011457C /* TrackerPropertiesCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerPropertiesCell.swift; sourceTree = "<group>"; };
 		5D7AC1782BBF89E8001027D9 /* IntForDays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntForDays.swift; sourceTree = "<group>"; };
+		5D7AC17A2BC09884001027D9 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		5DC39B9A2BA770F500F6CDB7 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 		5DC39B9C2BA771F000F6CDB7 /* StatisticsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsViewController.swift; sourceTree = "<group>"; };
 		5DC39C0D2BB5F8EE00F6CDB7 /* Tracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tracker.swift; sourceTree = "<group>"; };
@@ -121,6 +123,7 @@
 			children = (
 				5DC39C242BB970AF00F6CDB7 /* Colors.swift */,
 				5D7AC1782BBF89E8001027D9 /* IntForDays.swift */,
+				5D7AC17A2BC09884001027D9 /* ViewController.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -228,6 +231,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5DD2DB2F2B9FC4D000EF1636 /* TrackersViewController.swift in Sources */,
+				5D7AC17B2BC09884001027D9 /* ViewController.swift in Sources */,
 				5DC39C252BB970AF00F6CDB7 /* Colors.swift in Sources */,
 				5DC39C162BB876F200F6CDB7 /* TrackerCell.swift in Sources */,
 				5D267B482BBB701A0011457C /* ScheduleViewController.swift in Sources */,

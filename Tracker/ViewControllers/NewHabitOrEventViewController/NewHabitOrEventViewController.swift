@@ -216,11 +216,3 @@ extension NewHabitOrEventViewController: ScheduleViewControllerDelegate {
         checkFullFill()
     }
 }
-
-// MARK: - Extension UIViewController
-extension UIViewController {
-    func addTapGestureToHideKeyboard() {
-        let tapGesture = UITapGestureRecognizer(target: view, action: #selector(view.endEditing))
-        view.addGestureRecognizer(tapGesture)
-    }
-}
