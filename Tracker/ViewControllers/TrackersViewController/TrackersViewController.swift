@@ -73,6 +73,7 @@ final class TrackersViewController: UIViewController {
     private lazy var searchTextField: UISearchTextField = {
         let textField = UISearchTextField()
         textField.textColor = .ypBlack
+        textField.tintColor = .ypBlack
         textField.font = .systemFont(ofSize: 17, weight: .medium)
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.placeholder = "Поиск"
@@ -116,6 +117,7 @@ final class TrackersViewController: UIViewController {
         reloadData()
         conditionStubs()
         reloadPlaceholder()
+        addTapGestureToHideKeyboard()
     }
     
     // MARK: - Private Function
@@ -215,7 +217,7 @@ final class TrackersViewController: UIViewController {
     
     private func isSameTracker(trackerRecord: TrackerRecord, id: UUID) -> Bool {
         let isSameDay = Calendar.current.isDate(trackerRecord.date, inSameDayAs: currentDate)
-        return trackerRecord.id == id && isSameDay
+        return trackerRecord.id == id && isSameDay && currentDate <= Date()
     }
     
     private func reloadVisibleCategories(text: String?, date: Date) {
@@ -227,8 +229,9 @@ final class TrackersViewController: UIViewController {
                 let textCondition = filterText.isEmpty ||
                 tracker.name.lowercased().contains(filterText)
                 let dateCondition = tracker.schedule.contains { weekday in
-                    weekday?.numberValue == filterWeekday
-                } == true
+                    weekday?.numberValue == filterWeekday } ||
+                tracker.schedule.isEmpty == true &&
+                Calendar.current.isDate(tracker.dateEvent!, inSameDayAs: currentDate)
                 return textCondition && dateCondition
             }
             if trackers.isEmpty {
@@ -240,6 +243,7 @@ final class TrackersViewController: UIViewController {
             )
         }
         trackersCollectionView.reloadData()
+        conditionStubs()
         reloadPlaceholder()
     }
     
@@ -319,7 +323,7 @@ extension TrackersViewController: TrackerCellDelegate {
             completedTrackers.removeAll { trackerRecord in
                 isSameTracker(trackerRecord: trackerRecord, id: id)
             }
-        } else {
+        } else if currentDate <= Date() {
             let trackerRecord = TrackerRecord(id: id, date: currentDate)
             completedTrackers.append(trackerRecord)
         }
@@ -330,15 +334,29 @@ extension TrackersViewController: TrackerCellDelegate {
 // MARK: - Extension CreateTrackerViewControllerDelegate
 extension TrackersViewController: CreateTrackerViewControllerDelegate {
     func updateListOfTrackers(newTracker: TrackerCategory) {
+        let trackerOrEvent = addDateForEvent(newTracker: newTracker)
         let getExistCategory = categories.filter { $0.title == newTracker.title }
-        var updateCategory = [newTracker]
+        var updateCategory = [trackerOrEvent]
         if !getExistCategory.isEmpty {
-            updateCategory = [TrackerCategory(title: newTracker.title, trackers: getExistCategory[0].trackers + newTracker.trackers)]
+            updateCategory = [TrackerCategory(title: trackerOrEvent.title,
+                                              trackers: getExistCategory[0].trackers + trackerOrEvent.trackers)]
         }
         let lastCategories = categories.filter { $0.title != newTracker.title }
         self.categories = lastCategories + updateCategory
         
         reloadVisibleCategories(text: "", date: currentDate)
+    }
+    
+    private func addDateForEvent(newTracker: TrackerCategory) -> TrackerCategory {
+        let tracker = newTracker.trackers[0]
+        if tracker.schedule.isEmpty {
+            var event = tracker
+            event.dateEvent = currentDate
+            return TrackerCategory(
+                title: newTracker.title,
+                trackers: [event])
+        }
+        else { return newTracker }
     }
 }
 

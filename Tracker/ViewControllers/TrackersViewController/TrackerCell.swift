@@ -74,13 +74,22 @@ final class TrackerCell: UICollectionViewCell {
     
     weak var delegate: TrackerCellDelegate?
     
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+        addElements()
+        setupConstraints()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     //MARK: - Helper
     func configure(with tracker: Tracker, isCompletedToday: Bool, completedDays: Int, indexPath: IndexPath) {
         self.trackerId = tracker.id
         self.isCompletedToday = isCompletedToday
         self.indexPath = indexPath
-        addElements()
-        setupConstraints()
         
         mainView.backgroundColor = tracker.color
         plusButton.backgroundColor = tracker.color
@@ -91,7 +100,7 @@ final class TrackerCell: UICollectionViewCell {
         let image = isCompletedToday ? doneImage : plusImage
         plusButton.setImage(image, for: .normal)
         
-        counterLabel.text = pluralizeDays(completedDays)
+        counterLabel.text = completedDays.days()
     }
     
     //MARK: - Private Function
@@ -131,18 +140,18 @@ final class TrackerCell: UICollectionViewCell {
         ])
     }
     
-    private func pluralizeDays(_ count: Int) -> String {
-        let remainder10 = count % 10
-        let remainder100 = count % 100
-        
-        if remainder10 == 1 && remainder100 != 11 {
-            return "\(count) день"
-        } else if remainder10 >= 2 && remainder10 <= 4 && (remainder100 < 10 || remainder100 >= 20) {
-            return "\(count) дня"
-        } else {
-            return "\(count) дней"
-        }
-    }
+//    private func pluralizeDays(_ count: Int) -> String {
+//        let remainder10 = count % 10
+//        let remainder100 = count % 100
+//
+//        if remainder10 == 1 && remainder100 != 11 {
+//            return "\(count) день"
+//        } else if remainder10 >= 2 && remainder10 <= 4 && (remainder100 < 10 || remainder100 >= 20) {
+//            return "\(count) дня"
+//        } else {
+//            return "\(count) дней"
+//        }
+//    }
     
     //MARK: - @objc Function
     @objc private func plusButtonTapped() {

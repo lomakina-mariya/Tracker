@@ -11,6 +11,7 @@ final class NewHabitOrEventViewController: UIViewController {
     private  lazy var trackerNameInput: UITextField = {
         let textField = UITextField()
         textField.textColor = .ypBlack
+        textField.tintColor = .ypBlack
         textField.font = .systemFont(ofSize: 17, weight: .regular)
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.placeholder = "Введите название трекера"
@@ -26,6 +27,7 @@ final class NewHabitOrEventViewController: UIViewController {
     private  lazy var createButton: UIButton = {
         let button = UIButton()
         button.backgroundColor = .ypGray
+        button.isEnabled = false
         button.setTitle("Создать", for: .normal)
         button.tintColor = .ypWhite
         button.titleLabel?.textAlignment = .center
@@ -61,6 +63,7 @@ final class NewHabitOrEventViewController: UIViewController {
         return tableView
     }()
     
+    private var isTrackerNameFilled: Bool = false
     private var categoryTitle: String?
     private var color: UIColor?
     private var emoji: String?
@@ -76,6 +79,7 @@ final class NewHabitOrEventViewController: UIViewController {
         addElements()
         createNavigationBar()
         setupConstraints()
+        addTapGestureToHideKeyboard()
         trackerProperties.dataSource = self
         trackerProperties.delegate = self
     }
@@ -115,6 +119,17 @@ final class NewHabitOrEventViewController: UIViewController {
     private func createNavigationBar() {
         guard let navigationBar = navigationController?.navigationBar else { return }
         navigationBar.topItem?.title = eventMode ? "Новое нерегулярное событие" : "Новая привычка"
+    }
+    
+    private func checkFullFill() {
+        var allFullFill = false
+        if eventMode == false {
+            allFullFill = !schedule.isEmpty && isTrackerNameFilled
+        } else {
+            allFullFill = isTrackerNameFilled
+        }
+        createButton.isEnabled = allFullFill
+        createButton.backgroundColor = allFullFill ? .ypBlack : .ypGray
     }
     
     // MARK: - @objc Function
@@ -187,6 +202,9 @@ extension NewHabitOrEventViewController: UITextFieldDelegate {
         let newText = (currentText as NSString).replacingCharacters(in: range, with: string)
         let maxLength = 38
         
+        isTrackerNameFilled = !newText.isEmpty
+        checkFullFill()
+        
         return newText.count <= maxLength
     }
 }
@@ -195,5 +213,14 @@ extension NewHabitOrEventViewController: UITextFieldDelegate {
 extension NewHabitOrEventViewController: ScheduleViewControllerDelegate {
     func didSelectWeekdays(_ weekdays: [Weekdays]) {
         self.schedule = weekdays
+        checkFullFill()
+    }
+}
+
+// MARK: - Extension UIViewController
+extension UIViewController {
+    func addTapGestureToHideKeyboard() {
+        let tapGesture = UITapGestureRecognizer(target: view, action: #selector(view.endEditing))
+        view.addGestureRecognizer(tapGesture)
     }
 }
