@@ -43,8 +43,9 @@ final class CreateTrackerViewController: UIViewController {
     
     // MARK: - Life Cycle
     override func viewDidLoad() {
-        view.backgroundColor = .ypWhite
+        super.viewDidLoad()
         
+        view.backgroundColor = .ypWhite
         addElements()
         createNavigationBar()
         setupConstraints()

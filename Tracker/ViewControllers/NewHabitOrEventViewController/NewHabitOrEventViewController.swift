@@ -17,11 +17,23 @@ final class NewHabitOrEventViewController: UIViewController {
         textField.placeholder = "Введите название трекера"
         textField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: textField.frame.height))
         textField.leftViewMode = .always
+        textField.clearButtonMode = .whileEditing
         textField.backgroundColor = .ypLightGray.withAlphaComponent(0.3)
         textField.clipsToBounds = true
         textField.layer.cornerRadius = 16
         textField.delegate = self
         return textField
+    }()
+    
+    private let restrictiveLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Ограничение 38 символов"
+        label.textColor = .ypRed
+        label.textAlignment = .center
+        label.font = .systemFont(ofSize: 17, weight: .regular)
+        label.isHidden = true
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
     }()
     
     private  lazy var createButton: UIButton = {
@@ -56,6 +68,7 @@ final class NewHabitOrEventViewController: UIViewController {
     private lazy var trackerProperties: UITableView = {
         let tableView = UITableView()
         tableView.register(TrackerPropertiesCell.self, forCellReuseIdentifier: "cell")
+        tableView.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         tableView.layer.masksToBounds = true
         tableView.layer.cornerRadius = 16
         tableView.layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMaxXMinYCorner, .layerMinXMaxYCorner, .layerMinXMinYCorner]
@@ -74,8 +87,9 @@ final class NewHabitOrEventViewController: UIViewController {
     
     // MARK: - Life Cycle
     override func viewDidLoad() {
-        view.backgroundColor = .ypWhite
+        super.viewDidLoad()
         
+        view.backgroundColor = .ypWhite
         addElements()
         createNavigationBar()
         setupConstraints()
@@ -87,6 +101,7 @@ final class NewHabitOrEventViewController: UIViewController {
     // MARK: - Private Function
     private func addElements(){
         view.addSubview(trackerNameInput)
+        view.addSubview(restrictiveLabel)
         view.addSubview(cancelButton)
         view.addSubview(createButton)
         view.addSubview(trackerProperties)
@@ -99,9 +114,14 @@ final class NewHabitOrEventViewController: UIViewController {
             trackerNameInput.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             trackerNameInput.heightAnchor.constraint(equalToConstant: 75),
             
+            restrictiveLabel.topAnchor.constraint(equalTo: trackerNameInput.bottomAnchor, constant: 8),
+            restrictiveLabel.leadingAnchor.constraint(equalTo: trackerNameInput.leadingAnchor, constant: 28),
+            restrictiveLabel.trailingAnchor.constraint(equalTo: trackerNameInput.trailingAnchor, constant: -28),
+            restrictiveLabel.heightAnchor.constraint(equalToConstant: 22),
+            
             createButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
             createButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            createButton.widthAnchor.constraint(equalToConstant: 161),
+            createButton.widthAnchor.constraint(equalTo: cancelButton.widthAnchor),
             createButton.heightAnchor.constraint(equalToConstant: 60),
             
             cancelButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
@@ -111,8 +131,8 @@ final class NewHabitOrEventViewController: UIViewController {
             
             trackerProperties.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             trackerProperties.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            trackerProperties.topAnchor.constraint(equalTo: trackerNameInput.bottomAnchor, constant: 24),
-            trackerProperties.heightAnchor.constraint(equalToConstant: 150)
+            trackerProperties.topAnchor.constraint(equalTo: restrictiveLabel.bottomAnchor, constant: 24),
+            trackerProperties.heightAnchor.constraint(equalToConstant: eventMode ? 75 : 150)
         ])
     }
     
@@ -163,7 +183,15 @@ extension NewHabitOrEventViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         cell.backgroundColor = .ypLightGray.withAlphaComponent(0.3)
+        let lastCell = eventMode ? 0 : 1
+        if indexPath.row == lastCell {
+            cell.separatorInset = UIEdgeInsets(top: 0, left: cell.bounds.width, bottom: 0, right: 0)
+        }
         cell.configure(indexPath: indexPath)
+        if indexPath.row == 1 {
+            let detailsText = schedule.count == 7 ? "Каждый день" : schedule.map { $0!.shortDayName }.joined(separator: ", ")
+            cell.setup(detailsText: detailsText)
+        }
         cell.delegate = self
         return cell
     }
@@ -187,6 +215,7 @@ extension NewHabitOrEventViewController: TrackerPropertiesCellDelegate {
         if indexPath.row == 1 {
             let scheduleVC = ScheduleViewController()
             scheduleVC.delegate = self
+            scheduleVC.initialSelectedWeekdays = schedule
             let navVC = UINavigationController(rootViewController: scheduleVC)
             present(navVC, animated: true)
         }
@@ -200,11 +229,12 @@ extension NewHabitOrEventViewController: UITextFieldDelegate {
             return true
         }
         let newText = (currentText as NSString).replacingCharacters(in: range, with: string)
-        let maxLength = 38
         
         isTrackerNameFilled = !newText.isEmpty
         checkFullFill()
         
+        let maxLength = 38
+        restrictiveLabel.isHidden = newText.count < maxLength
         return newText.count <= maxLength
     }
 }
@@ -212,7 +242,9 @@ extension NewHabitOrEventViewController: UITextFieldDelegate {
 // MARK: - Extension ScheduleViewControllerDelegate
 extension NewHabitOrEventViewController: ScheduleViewControllerDelegate {
     func didSelectWeekdays(_ weekdays: [Weekdays]) {
-        self.schedule = weekdays
+        schedule = weekdays
+        schedule.sort { $0?.numberValueRus ?? 0 < $1?.numberValueRus ?? 0 }
+        trackerProperties.reloadData()
         checkFullFill()
     }
 }
