@@ -29,3 +29,24 @@ extension UIColor {
     static var CS17: UIColor { UIColor(named: "Color selection 17")!}
     static var CS18: UIColor { UIColor(named: "Color selection 18")!}
 }
+
+let colorDictionary: [String: UIColor] = [
+        "Color selection 1": UIColor.CS1,
+        "Color selection 2": UIColor.CS2,
+        "Color selection 3": UIColor.CS3,
+        "Color selection 4": UIColor.CS4,
+        "Color selection 5": UIColor.CS5,
+        "Color selection 6": UIColor.CS6,
+        "Color selection 7": UIColor.CS7,
+        "Color selection 8": UIColor.CS8,
+        "Color selection 9": UIColor.CS9,
+        "Color selection 10": UIColor.CS10,
+        "Color selection 11": UIColor.CS11,
+        "Color selection 12": UIColor.CS12,
+        "Color selection 13": UIColor.CS13,
+        "Color selection 14": UIColor.CS14,
+        "Color selection 15": UIColor.CS15,
+        "Color selection 16": UIColor.CS16,
+        "Color selection 17": UIColor.CS17,
+        "Color selection 18": UIColor.CS18
+    ]

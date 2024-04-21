@@ -28,11 +28,12 @@ final class TrackersViewController: UIViewController {
         cellSpacing: 9
     )
     
+    private var currentDate = Date().dateWithoutTime()
     private var categories: [TrackerCategory] = []
-    private var completedTrackers: [TrackerRecord] = []
     private var visibleCategories: [TrackerCategory] = []
-    private var currentDate = Date()
-    private var dataManager = DataManager.mocksTrackers
+    private var trackerCategoriesStore = TrackerCategoryStore()
+    private var trackerStore = TrackerStore()
+    private var trackerRecordStore = TrackerRecordStore()
     
     private lazy var stubImageView: UIImageView = {
         let image = UIImage(named: "stub")
@@ -109,6 +110,7 @@ final class TrackersViewController: UIViewController {
         super.viewDidLoad()
         
         view.backgroundColor = .ypWhite
+        trackerCategoriesStore.delegate = self
         trackersCollectionView.delegate = self
         trackersCollectionView.dataSource = self
         addElements()
@@ -205,19 +207,13 @@ final class TrackersViewController: UIViewController {
     }
     
     private func reloadData() {
-        categories = dataManager
+        categories = trackerCategoriesStore.trackersCategories
         datePickerValueChanged()
     }
     
     private func isCompletedToday(id: UUID) -> Bool {
-        return completedTrackers.contains {trackerRecord in
-            isSameTracker(trackerRecord: trackerRecord, id: id)
-        }
-    }
-    
-    private func isSameTracker(trackerRecord: TrackerRecord, id: UUID) -> Bool {
-        let isSameDay = Calendar.current.isDate(trackerRecord.date, inSameDayAs: currentDate)
-        return trackerRecord.id == id && isSameDay && currentDate <= Date()
+        let days = try? trackerRecordStore.fetchDays(for: id)
+        return (days?.contains(currentDate) ?? false) && currentDate <= Date().dateWithoutTime()
     }
     
     private func reloadVisibleCategories(text: String?, date: Date) {
@@ -231,7 +227,7 @@ final class TrackersViewController: UIViewController {
                 let dateCondition = tracker.schedule.contains { weekday in
                     weekday?.numberValue == filterWeekday } ||
                 tracker.schedule.isEmpty == true &&
-                Calendar.current.isDate(tracker.dateEvent!, inSameDayAs: currentDate)
+                tracker.dateEvent == currentDate
                 return textCondition && dateCondition
             }
             if trackers.isEmpty {
@@ -249,7 +245,7 @@ final class TrackersViewController: UIViewController {
     
     // MARK: - @objc Function
     @objc private func datePickerValueChanged() {
-        currentDate = datePicker.date
+        currentDate = datePicker.date.dateWithoutTime()
         reloadVisibleCategories(text: searchTextField.text, date: currentDate)
     }
     
@@ -284,8 +280,8 @@ extension TrackersViewController: UICollectionViewDataSource {
         let tracker = cellData[indexPath.section].trackers[indexPath.row]
         cell.delegate = self
         let isCompletedToday = isCompletedToday(id: tracker.id)
-        let completedDays = completedTrackers.filter { $0.id == tracker.id }.count
-        cell.configure(with: tracker, isCompletedToday: isCompletedToday, completedDays: completedDays, indexPath: indexPath)
+        let completedDays = try? trackerRecordStore.fetchDays(for: tracker.id).count
+        cell.configure(with: tracker, isCompletedToday: isCompletedToday, completedDays: completedDays ?? 0, indexPath: indexPath)
         return cell
     }
 }
@@ -318,14 +314,10 @@ extension TrackersViewController: UITextFieldDelegate {
 // MARK: - Extension TrackerCellDelegate
 extension TrackersViewController: TrackerCellDelegate {
     func completeTracker(id: UUID, at indexPath: IndexPath) {
-        let isCompletedToday = isCompletedToday(id: id)
-        if isCompletedToday {
-            completedTrackers.removeAll { trackerRecord in
-                isSameTracker(trackerRecord: trackerRecord, id: id)
-            }
-        } else if currentDate <= Date() {
-            let trackerRecord = TrackerRecord(id: id, date: currentDate)
-            completedTrackers.append(trackerRecord)
+        do {
+            try trackerRecordStore.addOrDeleteRecord(id: id, date: currentDate)
+        } catch {
+            print("Ошибка сохранения изменения трекера \(error)")
         }
         trackersCollectionView.reloadItems(at: [indexPath])
     }
@@ -333,18 +325,9 @@ extension TrackersViewController: TrackerCellDelegate {
 
 // MARK: - Extension CreateTrackerViewControllerDelegate
 extension TrackersViewController: CreateTrackerViewControllerDelegate {
-    func updateListOfTrackers(newTracker: TrackerCategory) {
+    func addNewTrackers(newTracker: TrackerCategory) {
         let trackerOrEvent = addDateForEvent(newTracker: newTracker)
-        let getExistCategory = categories.filter { $0.title == newTracker.title }
-        var updateCategory = [trackerOrEvent]
-        if !getExistCategory.isEmpty {
-            updateCategory = [TrackerCategory(title: trackerOrEvent.title,
-                                              trackers: getExistCategory[0].trackers + trackerOrEvent.trackers)]
-        }
-        let lastCategories = categories.filter { $0.title != newTracker.title }
-        self.categories = lastCategories + updateCategory
-        
-        reloadVisibleCategories(text: "", date: currentDate)
+        try? trackerStore.addNewTracker(trackerOrEvent.trackers[0], with: trackerOrEvent)
     }
     
     private func addDateForEvent(newTracker: TrackerCategory) -> TrackerCategory {
@@ -359,5 +342,15 @@ extension TrackersViewController: CreateTrackerViewControllerDelegate {
         else { return newTracker }
     }
 }
+
+// MARK: - TrackerCategoryStoreDelegate
+extension TrackersViewController: TrackerCategoryStoreDelegate {
+    func didUpdate(_ store: TrackerCategoryStore, _ update: TrackerCategoryStoreUpdate) {
+        categories = store.trackersCategories
+        reloadVisibleCategories(text: "", date: currentDate)
+        trackersCollectionView.reloadData()
+    }
+}
+
 
 
