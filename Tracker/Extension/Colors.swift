@@ -10,43 +10,153 @@ extension UIColor {
     static var ypRed: UIColor { UIColor(named: "YP Red") ?? UIColor.red }
     static var ypGray: UIColor { UIColor(named: "YP Gray") ?? UIColor.gray }
     static var ypLightGray: UIColor { UIColor(named: "YP Light Gray") ?? UIColor.lightGray }
-    static var CS1: UIColor { UIColor(named: "Color selection 1")!}
-    static var CS2: UIColor { UIColor(named: "Color selection 2")!}
-    static var CS3: UIColor { UIColor(named: "Color selection 3")!}
-    static var CS4: UIColor { UIColor(named: "Color selection 4")!}
-    static var CS5: UIColor { UIColor(named: "Color selection 5")!}
-    static var CS6: UIColor { UIColor(named: "Color selection 6")!}
-    static var CS7: UIColor { UIColor(named: "Color selection 7")!}
-    static var CS8: UIColor { UIColor(named: "Color selection 8")!}
-    static var CS9: UIColor { UIColor(named: "Color selection 9")!}
-    static var CS10: UIColor { UIColor(named: "Color selection 10")!}
-    static var CS11: UIColor { UIColor(named: "Color selection 11")!}
-    static var CS12: UIColor { UIColor(named: "Color selection 12")!}
-    static var CS13: UIColor { UIColor(named: "Color selection 13")!}
-    static var CS14: UIColor { UIColor(named: "Color selection 14")!}
-    static var CS15: UIColor { UIColor(named: "Color selection 15")!}
-    static var CS16: UIColor { UIColor(named: "Color selection 16")!}
-    static var CS17: UIColor { UIColor(named: "Color selection 17")!}
-    static var CS18: UIColor { UIColor(named: "Color selection 18")!}
+    
+    static var colorSelection1: UIColor {
+        guard let color = UIColor(named: "Color selection 1") else {
+            assertionFailure("Unable to load color")
+            return UIColor.white
+        }
+        return color
+    }
+    static var colorSelection2: UIColor {
+        guard let color = UIColor(named: "Color selection 2") else {
+            assertionFailure("Unable to load color")
+            return UIColor.white
+        }
+        return color
+    }
+    static var colorSelection3: UIColor {
+        guard let color = UIColor(named: "Color selection 3") else {
+            assertionFailure("Unable to load color")
+            return UIColor.white
+        }
+        return color
+    }
+    static var colorSelection4: UIColor {
+        guard let color = UIColor(named: "Color selection 4") else {
+            assertionFailure("Unable to load color")
+            return UIColor.white
+        }
+        return color
+    }
+    static var colorSelection5: UIColor {
+        guard let color = UIColor(named: "Color selection 5") else {
+            assertionFailure("Unable to load color")
+            return UIColor.white
+        }
+        return color
+    }
+    static var colorSelection6: UIColor {
+        guard let color = UIColor(named: "Color selection 6") else {
+            assertionFailure("Unable to load color")
+            return UIColor.white
+        }
+        return color
+    }
+    static var colorSelection7: UIColor {
+        guard let color = UIColor(named: "Color selection 7") else {
+            assertionFailure("Unable to load color")
+            return UIColor.white
+        }
+        return color
+    }
+    static var colorSelection8: UIColor {
+        guard let color = UIColor(named: "Color selection 8") else {
+            assertionFailure("Unable to load color")
+            return UIColor.white
+        }
+        return color
+    }
+    static var colorSelection9: UIColor {
+        guard let color = UIColor(named: "Color selection 9") else {
+            assertionFailure("Unable to load color")
+            return UIColor.white
+        }
+        return color
+    }
+    static var colorSelection10: UIColor {
+        guard let color = UIColor(named: "Color selection 10") else {
+            assertionFailure("Unable to load color")
+            return UIColor.white
+        }
+        return color
+    }
+    static var colorSelection11: UIColor {
+        guard let color = UIColor(named: "Color selection 11") else {
+            assertionFailure("Unable to load color")
+            return UIColor.white
+        }
+        return color
+    }
+    static var colorSelection12: UIColor {
+        guard let color = UIColor(named: "Color selection 12") else {
+            assertionFailure("Unable to load color")
+            return UIColor.white
+        }
+        return color
+    }
+    static var colorSelection13: UIColor {
+        guard let color = UIColor(named: "Color selection 13") else {
+            assertionFailure("Unable to load color")
+            return UIColor.white
+        }
+        return color
+    }
+    static var colorSelection14: UIColor {
+        guard let color = UIColor(named: "Color selection 14") else {
+            assertionFailure("Unable to load color")
+            return UIColor.white
+        }
+        return color
+    }
+    static var colorSelection15: UIColor {
+        guard let color = UIColor(named: "Color selection 15") else {
+            assertionFailure("Unable to load color")
+            return UIColor.white
+        }
+        return color
+    }
+    static var colorSelection16: UIColor {
+        guard let color = UIColor(named: "Color selection 16") else {
+            assertionFailure("Unable to load color")
+            return UIColor.white
+        }
+        return color
+    }
+    static var colorSelection17: UIColor {
+        guard let color = UIColor(named: "Color selection 17") else {
+            assertionFailure("Unable to load color")
+            return UIColor.white
+        }
+        return color
+    }
+    static var colorSelection18: UIColor {
+        guard let color = UIColor(named: "Color selection 18") else {
+            assertionFailure("Unable to load color")
+            return UIColor.white
+        }
+        return color
+    }
+    
 }
 
 let colorDictionary: [String: UIColor] = [
-        "Color selection 1": UIColor.CS1,
-        "Color selection 2": UIColor.CS2,
-        "Color selection 3": UIColor.CS3,
-        "Color selection 4": UIColor.CS4,
-        "Color selection 5": UIColor.CS5,
-        "Color selection 6": UIColor.CS6,
-        "Color selection 7": UIColor.CS7,
-        "Color selection 8": UIColor.CS8,
-        "Color selection 9": UIColor.CS9,
-        "Color selection 10": UIColor.CS10,
-        "Color selection 11": UIColor.CS11,
-        "Color selection 12": UIColor.CS12,
-        "Color selection 13": UIColor.CS13,
-        "Color selection 14": UIColor.CS14,
-        "Color selection 15": UIColor.CS15,
-        "Color selection 16": UIColor.CS16,
-        "Color selection 17": UIColor.CS17,
-        "Color selection 18": UIColor.CS18
+        "Color selection 1": UIColor.colorSelection1,
+        "Color selection 2": UIColor.colorSelection2,
+        "Color selection 3": UIColor.colorSelection3,
+        "Color selection 4": UIColor.colorSelection4,
+        "Color selection 5": UIColor.colorSelection5,
+        "Color selection 6": UIColor.colorSelection6,
+        "Color selection 7": UIColor.colorSelection7,
+        "Color selection 8": UIColor.colorSelection8,
+        "Color selection 9": UIColor.colorSelection9,
+        "Color selection 10": UIColor.colorSelection10,
+        "Color selection 11": UIColor.colorSelection11,
+        "Color selection 12": UIColor.colorSelection12,
+        "Color selection 13": UIColor.colorSelection13,
+        "Color selection 14": UIColor.colorSelection14,
+        "Color selection 15": UIColor.colorSelection15,
+        "Color selection 16": UIColor.colorSelection16,
+        "Color selection 17": UIColor.colorSelection17,
+        "Color selection 18": UIColor.colorSelection18
     ]
