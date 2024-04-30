@@ -139,20 +139,7 @@ final class TrackerCell: UICollectionViewCell {
             counterLabel.heightAnchor.constraint(equalToConstant: 18)
         ])
     }
-    
-//    private func pluralizeDays(_ count: Int) -> String {
-//        let remainder10 = count % 10
-//        let remainder100 = count % 100
-//
-//        if remainder10 == 1 && remainder100 != 11 {
-//            return "\(count) день"
-//        } else if remainder10 >= 2 && remainder10 <= 4 && (remainder100 < 10 || remainder100 >= 20) {
-//            return "\(count) дня"
-//        } else {
-//            return "\(count) дней"
-//        }
-//    }
-    
+
     //MARK: - @objc Function
     @objc private func plusButtonTapped() {
         guard let trackerId = trackerId,
