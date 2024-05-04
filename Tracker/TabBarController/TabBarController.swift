@@ -5,6 +5,8 @@ final class TabBarController: UITabBarController {
         super.viewDidLoad()
         self.tabBar.layer.borderWidth = 0.5
         self.tabBar.layer.borderColor = UIColor.gray.cgColor
+        UITabBar.appearance().tintColor = .ypBlue
+        UITabBar.appearance().unselectedItemTintColor = .ypGray
         let normalColor = UIColor.ypGray
         let selectedColor = UIColor.ypBlue
         UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.foregroundColor: normalColor], for: .normal)

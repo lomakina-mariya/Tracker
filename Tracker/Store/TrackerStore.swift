@@ -33,12 +33,13 @@ final class TrackerStore: NSObject {
     }
 
     func updateExistingTrackers(_ trackerCoreData: TrackerCoreData, with tracker: Tracker) {
+        let scheduleString = tracker.schedule.compactMap { $0?.rawValue }.joined(separator: ",")
         guard let (colorString, _) = colorDictionary.first(where: { $0.value == tracker.color }) else { return }
         trackerCoreData.id = tracker.id
         trackerCoreData.name = tracker.name
         trackerCoreData.color = colorString
         trackerCoreData.emoji = tracker.emoji
-        trackerCoreData.schedule = DaysValueTransformer().transformedValue(tracker.schedule) as? NSObject
+        trackerCoreData.schedule = scheduleString
         trackerCoreData.dateEvent = tracker.dateEvent
     }
     

@@ -73,7 +73,7 @@ final class TrackerCategoryStore: NSObject {
                     name: trackerCoreData.name ?? "",
                     color: UIColor(named: trackerCoreData.color!) ?? UIColor(),
                     emoji: trackerCoreData.emoji ?? "",
-                    schedule: (DaysValueTransformer().reverseTransformedValue(trackerCoreData.schedule) as? [Weekdays?]) ?? [],
+                    schedule: trackerCoreData.schedule?.components(separatedBy: ",").map { Weekdays(rawValue: $0) } ?? [],
                     dateEvent: trackerCoreData.dateEvent
                 )
                 trackers.append(tracker)
