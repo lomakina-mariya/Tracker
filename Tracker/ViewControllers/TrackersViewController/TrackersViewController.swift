@@ -29,10 +29,10 @@ final class TrackersViewController: UIViewController {
     )
     
     private var currentDate = Date().dateWithoutTime()
+    private var text = ""
     private var categories: [TrackerCategory] = []
     private var visibleCategories: [TrackerCategory] = []
-    private var trackerCategoriesStore = TrackerCategoryStore()
-    private var trackerStore = TrackerStore()
+    private var trackerStore = TrackerStore(date: Date().dateWithoutTime(), text: "")
     private var trackerRecordStore = TrackerRecordStore()
     
     private lazy var stubImageView: UIImageView = {
@@ -110,7 +110,7 @@ final class TrackersViewController: UIViewController {
         super.viewDidLoad()
         
         view.backgroundColor = .ypWhite
-        trackerCategoriesStore.delegate = self
+        trackerStore.delegate = self
         trackersCollectionView.delegate = self
         trackersCollectionView.dataSource = self
         addElements()
@@ -207,7 +207,7 @@ final class TrackersViewController: UIViewController {
     }
     
     private func reloadData() {
-        categories = trackerCategoriesStore.trackersCategories
+        //categories = trackerStore.trackersCategories
         datePickerValueChanged()
     }
     
@@ -217,27 +217,10 @@ final class TrackersViewController: UIViewController {
     }
     
     private func reloadVisibleCategories(text: String?, date: Date) {
-        let calendar = Calendar.current
-        let filterWeekday = calendar.component(.weekday, from: date)
-        let filterText = (text ?? "").lowercased()
-        visibleCategories = categories.compactMap { category in
-            let trackers = category.trackers.filter { tracker in
-                let textCondition = filterText.isEmpty ||
-                tracker.name.lowercased().contains(filterText)
-                let dateCondition = tracker.schedule.contains { weekday in
-                    weekday?.numberValue == filterWeekday } ||
-                tracker.schedule.isEmpty == true &&
-                tracker.dateEvent == currentDate
-                return textCondition && dateCondition
-            }
-            if trackers.isEmpty {
-                return nil
-            }
-            return TrackerCategory(
-                title: category.title,
-                trackers: trackers
-            )
-        }
+        trackerStore.update(with: date, text: text)
+        categories = trackerStore.trackersCategories
+
+        visibleCategories = categories
         trackersCollectionView.reloadData()
         conditionStubs()
         reloadPlaceholder()
@@ -344,11 +327,9 @@ extension TrackersViewController: CreateTrackerViewControllerDelegate {
 }
 
 // MARK: - TrackerCategoryStoreDelegate
-extension TrackersViewController: TrackerCategoryStoreDelegate {
-    func didUpdate(_ store: TrackerCategoryStore, _ update: TrackerCategoryStoreUpdate) {
-        categories = store.trackersCategories
-        reloadVisibleCategories(text: "", date: currentDate)
-        trackersCollectionView.reloadData()
+extension TrackersViewController: TrackerStoreDelegate {
+    func didUpdate(_ store: TrackerStore, _ update: TrackerStoreUpdate) {
+        reloadVisibleCategories(text: text, date: currentDate)
     }
 }
 
