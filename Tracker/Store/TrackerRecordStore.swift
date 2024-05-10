@@ -17,8 +17,15 @@ final class TrackerRecordStore: NSObject {
         super.init()
     }
     
-    func completedDays(for id: UUID) throws -> [Date] {
-        return try fetchDays(for: id)
+    private func fetchRecord(id: UUID, date: Date) throws -> TrackerRecordCoreData? {
+        let fetchRequest: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "id == %@ AND date == %@", id as CVarArg, date as CVarArg)
+        do {
+            let result = try context.fetch(fetchRequest)
+            return result.first
+        } catch {
+            throw error
+        }
     }
     
     func fetchDays(for id: UUID) throws -> [Date] {
@@ -40,16 +47,5 @@ final class TrackerRecordStore: NSObject {
             }
         }
         try context.save()
-    }
-    
-    func fetchRecord(id: UUID, date: Date) throws -> TrackerRecordCoreData? {
-        let fetchRequest: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "id == %@ AND date == %@", id as CVarArg, date as CVarArg)
-        do {
-            let result = try context.fetch(fetchRequest)
-            return result.first
-        } catch {
-            throw error
-        }
     }
 }

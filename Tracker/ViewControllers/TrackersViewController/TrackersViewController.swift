@@ -29,11 +29,14 @@ final class TrackersViewController: UIViewController {
     )
     
     private var currentDate = Date().dateWithoutTime()
-    private var text = ""
-    private var categories: [TrackerCategory] = []
+    private var isCategoriesEmpty: Bool = false {
+        didSet {
+            self.conditionStubs()
+            self.reloadPlaceholder()
+        }
+    }
     private var visibleCategories: [TrackerCategory] = []
-    private var trackerStore = TrackerStore(date: Date().dateWithoutTime(), text: "")
-    private var trackerRecordStore = TrackerRecordStore()
+    private var viewModel: TrackersViewModel?
     
     private lazy var stubImageView: UIImageView = {
         let image = UIImage(named: "stub")
@@ -108,23 +111,33 @@ final class TrackersViewController: UIViewController {
     // MARK: - Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         view.backgroundColor = .ypWhite
-        trackerStore.delegate = self
+        
+        viewModel = TrackersViewModel()
+        if viewModel != nil {
+            isCategoriesEmpty = viewModel!.isCategoriesEmpty
+        }
+        viewModel?.categoriesBinding = { [weak self] categories in
+            guard let self = self else { return }
+            self.visibleCategories = categories
+            self.reloadPlaceholder()
+            self.trackersCollectionView.reloadData()
+        }
+        
         trackersCollectionView.delegate = self
         trackersCollectionView.dataSource = self
         addElements()
         createNavigationBar()
         setupConstraints()
-        reloadData()
         conditionStubs()
         reloadPlaceholder()
         addTapGestureToHideKeyboard()
+        reloadData()
     }
     
     // MARK: - Private Function
     private func conditionStubs() {
-        if categories.isEmpty {
+        if isCategoriesEmpty {
             trackersCollectionView.isHidden = true
             stubLabel.isHidden = false
             stubImageView.isHidden = false
@@ -138,7 +151,7 @@ final class TrackersViewController: UIViewController {
     }
     
     private func reloadPlaceholder() {
-        if !categories.isEmpty && visibleCategories.isEmpty {
+        if !isCategoriesEmpty && visibleCategories.isEmpty {
             notFoundImageView.isHidden = false
             notFoundLabel.isHidden = false
             stubLabel.isHidden = true
@@ -207,22 +220,11 @@ final class TrackersViewController: UIViewController {
     }
     
     private func reloadData() {
-        //categories = trackerStore.trackersCategories
         datePickerValueChanged()
     }
     
-    private func isCompletedToday(id: UUID) -> Bool {
-        let days = try? trackerRecordStore.fetchDays(for: id)
-        return (days?.contains(currentDate) ?? false) && currentDate <= Date().dateWithoutTime()
-    }
-    
     private func reloadVisibleCategories(text: String?, date: Date) {
-        trackerStore.update(with: date, text: text)
-        categories = trackerStore.trackersCategories
-
-        visibleCategories = categories
-        trackersCollectionView.reloadData()
-        conditionStubs()
+        viewModel?.updateStore(with: date, text: text ?? "")
         reloadPlaceholder()
     }
     
@@ -243,11 +245,11 @@ final class TrackersViewController: UIViewController {
 extension TrackersViewController: UICollectionViewDataSource {
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return visibleCategories.count
+        return viewModel?.categories.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return visibleCategories[section].trackers.count
+        return viewModel?.categories[section].trackers.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
@@ -262,9 +264,8 @@ extension TrackersViewController: UICollectionViewDataSource {
         let cellData = visibleCategories
         let tracker = cellData[indexPath.section].trackers[indexPath.row]
         cell.delegate = self
-        let isCompletedToday = isCompletedToday(id: tracker.id)
-        let completedDays = try? trackerRecordStore.fetchDays(for: tracker.id).count
-        cell.configure(with: tracker, isCompletedToday: isCompletedToday, completedDays: completedDays ?? 0, indexPath: indexPath)
+        let completedDays = viewModel?.completedDays(for: tracker.id)
+        cell.configure(with: tracker, isCompletedToday: completedDays?.completed ?? false, completedDays: completedDays?.number ?? 0, indexPath: indexPath)
         return cell
     }
 }
@@ -297,11 +298,7 @@ extension TrackersViewController: UITextFieldDelegate {
 // MARK: - Extension TrackerCellDelegate
 extension TrackersViewController: TrackerCellDelegate {
     func completeTracker(id: UUID, at indexPath: IndexPath) {
-        do {
-            try trackerRecordStore.addOrDeleteRecord(id: id, date: currentDate)
-        } catch {
-            print("Ошибка сохранения изменения трекера \(error)")
-        }
+        viewModel?.completeTracker(id: id, date: currentDate)
         trackersCollectionView.reloadItems(at: [indexPath])
     }
 }
@@ -310,7 +307,8 @@ extension TrackersViewController: TrackerCellDelegate {
 extension TrackersViewController: CreateTrackerViewControllerDelegate {
     func addNewTrackers(newTracker: TrackerCategory) {
         let trackerOrEvent = addDateForEvent(newTracker: newTracker)
-        try? trackerStore.addNewTracker(trackerOrEvent.trackers[0], with: trackerOrEvent)
+        isCategoriesEmpty = false
+        viewModel?.addNewTracker(trackerOrEvent.trackers[0], with: trackerOrEvent)
     }
     
     private func addDateForEvent(newTracker: TrackerCategory) -> TrackerCategory {
@@ -325,13 +323,5 @@ extension TrackersViewController: CreateTrackerViewControllerDelegate {
         else { return newTracker }
     }
 }
-
-// MARK: - TrackerCategoryStoreDelegate
-extension TrackersViewController: TrackerStoreDelegate {
-    func didUpdate(_ store: TrackerStore, _ update: TrackerStoreUpdate) {
-        reloadVisibleCategories(text: text, date: currentDate)
-    }
-}
-
 
 
