@@ -11,9 +11,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window = UIWindow()
         window?.rootViewController = UIViewController()
         window?.makeKeyAndVisible()
-        
-        DaysValueTransformer.register()
-        
         return true
     }
 

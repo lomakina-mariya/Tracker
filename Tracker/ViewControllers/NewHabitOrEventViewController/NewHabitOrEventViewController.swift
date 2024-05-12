@@ -173,7 +173,7 @@ final class NewHabitOrEventViewController: UIViewController {
     ]
     private let emojiArray: [String] = ["🙂", "😻", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝️", "😪"]
     private var isTrackerNameFilled: Bool = false
-    private var categoryTitle: String?
+    private var categoryTitle = ""
     private var color: UIColor?
     private var emoji: String?
     private var schedule: [Weekdays?] = []
@@ -285,9 +285,9 @@ final class NewHabitOrEventViewController: UIViewController {
     private func checkFullFill() {
         var allFullFill = false
         if eventMode == false {
-            allFullFill = !schedule.isEmpty && isTrackerNameFilled
+            allFullFill = !schedule.isEmpty && isTrackerNameFilled && !categoryTitle.isEmpty && (emoji != nil) && (color != nil)
         } else {
-            allFullFill = isTrackerNameFilled
+            allFullFill = isTrackerNameFilled && !categoryTitle.isEmpty && (emoji != nil) && (color != nil)
         }
         createButton.isEnabled = allFullFill
         createButton.backgroundColor = allFullFill ? .ypBlack : .ypGray
@@ -302,11 +302,11 @@ final class NewHabitOrEventViewController: UIViewController {
         let newTracker = Tracker(
             id: UUID(),
             name: trackerNameInput.text ?? "",
-            color: self.color ?? .colorSelection17,
+            color: colorDictionary.first(where: { $0.value == self.color })?.key ?? "Color selection 17",
             emoji: self.emoji ?? "❤️",
             schedule: self.schedule)
         let category = TrackerCategory(
-            title: self.categoryTitle ?? "Отдых",
+            title: self.categoryTitle,
             trackers: [newTracker])
         delegate?.addNewTracker(newTracker: category)
         dismiss(animated: true, completion: nil)
@@ -332,6 +332,8 @@ extension NewHabitOrEventViewController: UITableViewDataSource {
         if indexPath.row == 1 {
             let detailsText = schedule.count == 7 ? "Каждый день" : schedule.map { $0!.shortDayName }.joined(separator: ", ")
             cell.setup(detailsText: detailsText)
+        } else {
+            cell.setup(detailsText: categoryTitle)
         }
         cell.delegate = self
         return cell
@@ -359,6 +361,12 @@ extension NewHabitOrEventViewController: TrackerPropertiesCellDelegate {
             scheduleVC.initialSelectedWeekdays = schedule
             let navVC = UINavigationController(rootViewController: scheduleVC)
             present(navVC, animated: true)
+        } else {
+            let listOfCategoriesVC = ListOfCategoriesViewController()
+            listOfCategoriesVC.selectedCategory = categoryTitle
+            listOfCategoriesVC.delegate = self
+            let navVC = UINavigationController(rootViewController: listOfCategoriesVC)
+            present(navVC, animated: true)
         }
     }
 }
@@ -370,13 +378,28 @@ extension NewHabitOrEventViewController: UITextFieldDelegate {
             return true
         }
         let newText = (currentText as NSString).replacingCharacters(in: range, with: string)
-        
         isTrackerNameFilled = !newText.isEmpty
         checkFullFill()
-        
         let maxLength = 38
         restrictiveLabel.isHidden = newText.count < maxLength
         return newText.count <= maxLength
+    }
+    
+    func textFieldDidChangeSelection(_ textField: UITextField) {
+        guard let newText = textField.text else {
+            return
+        }
+        isTrackerNameFilled = !newText.isEmpty
+        checkFullFill()
+    }
+}
+
+// MARK: - Extension ListOfCategoriesDelegate
+extension NewHabitOrEventViewController: ListOfCategoriesDelegate {
+    func didSelectCategory(_ category: String) {
+        categoryTitle = category
+        trackerProperties.reloadData()
+        checkFullFill()
     }
 }
 
@@ -439,6 +462,7 @@ extension NewHabitOrEventViewController: UICollectionViewDelegateFlowLayout {
             cell?.contentView.layer.borderWidth = 3
             cell?.contentView.layer.borderColor = color?.withAlphaComponent(0.3).cgColor
         }
+        checkFullFill()
     }
     
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {

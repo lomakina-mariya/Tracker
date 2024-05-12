@@ -1,6 +1,5 @@
 
 import Foundation
-import UIKit
 
 struct TrackerRecord {
     let id: UUID

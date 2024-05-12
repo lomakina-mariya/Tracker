@@ -1,6 +1,5 @@
 
 import Foundation
-import UIKit
 
 enum Weekdays: String, CaseIterable, Codable {
     case Monday = "Понедельник"
@@ -66,6 +65,10 @@ enum Weekdays: String, CaseIterable, Codable {
         case .Sunday:
             return 7
         }
+    }
+    
+    static func fromNumberValue(_ number: Int) -> String {
+        return Weekdays.allCases.first { $0.numberValue == number }!.rawValue
     }
 }
 
