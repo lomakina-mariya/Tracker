@@ -35,7 +35,9 @@ final class TrackersViewController: UIViewController {
             self.reloadPlaceholder()
         }
     }
-    private var visibleCategories: [TrackerCategory] = []
+    private var visibleCategories: [TrackerCategory] {
+        return viewModel?.categories ?? [TrackerCategory]()
+    }
     private var viewModel: TrackersViewModel?
     
     private lazy var stubImageView: UIImageView = {
@@ -119,7 +121,6 @@ final class TrackersViewController: UIViewController {
         }
         viewModel?.categoriesBinding = { [weak self] categories in
             guard let self = self else { return }
-            self.visibleCategories = categories
             self.reloadPlaceholder()
             self.trackersCollectionView.reloadData()
         }
