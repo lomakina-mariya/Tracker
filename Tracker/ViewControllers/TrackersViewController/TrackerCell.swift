@@ -91,8 +91,8 @@ final class TrackerCell: UICollectionViewCell {
         self.isCompletedToday = isCompletedToday
         self.indexPath = indexPath
         
-        mainView.backgroundColor = tracker.color
-        plusButton.backgroundColor = tracker.color
+        mainView.backgroundColor = UIColor(named: tracker.color)
+        plusButton.backgroundColor = UIColor(named: tracker.color)
         
         taskTitleLabel.text = tracker.name
         emojiLabel.text = tracker.emoji

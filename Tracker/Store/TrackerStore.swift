@@ -44,7 +44,7 @@ final class TrackerStore: NSObject {
             let tracker = Tracker(
                 id: object.id ?? UUID(),
                 name: object.name ?? "",
-                color: UIColor(named: object.color!) ?? UIColor(),
+                color: object.color ?? "Color selection 17",
                 emoji: object.emoji ?? "",
                 schedule: object.schedule?.components(separatedBy: ",").map { Weekdays(rawValue: $0) } ?? [],
                 dateEvent: object.dateEvent
@@ -118,10 +118,10 @@ final class TrackerStore: NSObject {
     
     private func updateExistingTrackers(_ trackerCoreData: TrackerCoreData, with tracker: Tracker) {
         let scheduleString = tracker.schedule.compactMap { $0?.rawValue }.joined(separator: ",")
-        guard let (colorString, _) = colorDictionary.first(where: { $0.value == tracker.color }) else { return }
+        //guard let (colorString, _) = colorDictionary.first(where: { $0.value == tracker.color }) else { return }
         trackerCoreData.id = tracker.id
         trackerCoreData.name = tracker.name
-        trackerCoreData.color = colorString
+        trackerCoreData.color = tracker.color
         trackerCoreData.emoji = tracker.emoji
         trackerCoreData.schedule = scheduleString
         trackerCoreData.dateEvent = tracker.dateEvent
