@@ -29,17 +29,17 @@ final class TrackersViewController: UIViewController {
     )
     
     private var currentDate = Date().dateWithoutTime()
-    private var isCategoriesEmpty: Bool = false {
+    private var completedFilter: Bool?
+    private var trackersIsEmpty: Bool = true {
         didSet {
-            self.conditionStubs()
-            self.reloadPlaceholder()
+            conditionStubs()
         }
     }
+    private var viewModel: TrackersViewModel?
     private var visibleCategories: [TrackerCategory] {
         return viewModel?.categories ?? [TrackerCategory]()
     }
-    private var viewModel: TrackersViewModel?
-    
+    private var savedFilter: Filters?
     private lazy var stubImageView: UIImageView = {
         let image = UIImage(named: "stub")
         let imageView = UIImageView(image: image)
@@ -104,10 +104,25 @@ final class TrackersViewController: UIViewController {
     
     private lazy var trackersCollectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+        collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 60, right: 0)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.register(TrackerCell.self, forCellWithReuseIdentifier: "cell")
         collectionView.register(HeaderSectionView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header")
         return collectionView
+    }()
+    
+    private lazy var filterButton: UIButton = {
+        let button = UIButton()
+        button.backgroundColor = .ypBlue
+        button.setTitle("Фильтры", for: .normal)
+        button.tintColor = .ypWhite
+        button.titleLabel?.textAlignment = .center
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: .regular)
+        button.clipsToBounds = true
+        button.layer.cornerRadius = 16
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(filterButtonTapped), for: .touchUpInside)
+        return button
     }()
     
     // MARK: - Life Cycle
@@ -116,34 +131,32 @@ final class TrackersViewController: UIViewController {
         view.backgroundColor = .ypWhite
         
         viewModel = TrackersViewModel()
-        if viewModel != nil {
-            isCategoriesEmpty = viewModel!.isCategoriesEmpty
-        }
-        viewModel?.categoriesBinding = { [weak self] categories in
+        viewModel?.categoriesBinding = { [weak self] _ in
             guard let self = self else { return }
             self.reloadPlaceholder()
             self.trackersCollectionView.reloadData()
         }
-        
+        trackersIsEmpty = visibleCategories.isEmpty
         trackersCollectionView.delegate = self
         trackersCollectionView.dataSource = self
         addElements()
         createNavigationBar()
         setupConstraints()
-        conditionStubs()
-        reloadPlaceholder()
         addTapGestureToHideKeyboard()
-        reloadData()
+        savedFilter = loadFilter()
+        useSelectedFilter(selectedFilter: savedFilter ?? Filters.allTrackers)
     }
     
     // MARK: - Private Function
     private func conditionStubs() {
-        if isCategoriesEmpty {
+        if trackersIsEmpty {
             trackersCollectionView.isHidden = true
+            filterButton.isHidden = true
             stubLabel.isHidden = false
             stubImageView.isHidden = false
         } else {
             trackersCollectionView.isHidden = false
+            filterButton.isHidden = false
             stubLabel.isHidden = true
             stubImageView.isHidden = true
             notFoundImageView.isHidden = true
@@ -152,14 +165,16 @@ final class TrackersViewController: UIViewController {
     }
     
     private func reloadPlaceholder() {
-        if !isCategoriesEmpty && visibleCategories.isEmpty {
+        if !trackersIsEmpty && visibleCategories.isEmpty {
             notFoundImageView.isHidden = false
             notFoundLabel.isHidden = false
             stubLabel.isHidden = true
             stubImageView.isHidden = true
+            filterButton.isHidden = true
         } else {
             notFoundImageView.isHidden = true
             notFoundLabel.isHidden = true
+            filterButton.isHidden = false
         }
     }
     
@@ -186,7 +201,12 @@ final class TrackersViewController: UIViewController {
             searchTextField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             searchTextField.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
             searchTextField.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
-            searchTextField.heightAnchor.constraint(equalToConstant: 36)
+            searchTextField.heightAnchor.constraint(equalToConstant: 36),
+            
+            filterButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+            filterButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            filterButton.widthAnchor.constraint(equalToConstant: 114),
+            filterButton.heightAnchor.constraint(equalToConstant: 50)
         ])
     }
     
@@ -197,6 +217,7 @@ final class TrackersViewController: UIViewController {
         view.addSubview(searchTextField)
         view.addSubview(notFoundImageView)
         view.addSubview(notFoundLabel)
+        view.addSubview(filterButton)
         notFoundImageView.isHidden = true
         notFoundLabel.isHidden = true
     }
@@ -225,8 +246,56 @@ final class TrackersViewController: UIViewController {
     }
     
     private func reloadVisibleCategories(text: String?, date: Date) {
-        viewModel?.updateStore(with: date, text: text ?? "")
-        reloadPlaceholder()
+        viewModel?.updateStore(with: date, text: text ?? "", completedFilter: self.completedFilter)
+        //reloadPlaceholder()
+    }
+    
+    private func checkTrackersIsEmpty() {
+        viewModel?.updateStore(with: Date.distantPast, text: "", completedFilter: nil)
+        self.trackersIsEmpty = viewModel?.categories.isEmpty ?? true
+    }
+    
+    private func loadFilter() -> Filters {
+        if let savedFilterString = UserDefaults.standard.string(forKey: "selectedFilter"),
+           let savedFilter = Filters(rawValue: savedFilterString) {
+            return savedFilter
+        }
+        return Filters.todayTrackers
+    }
+    
+    private func createPreview(for view: UIView) -> UIViewController {
+        let previewController = UIViewController()
+        previewController.preferredContentSize = view.frame.size
+        guard let previewView = view.snapshotView(afterScreenUpdates: true)  else { return UIViewController() }
+        previewView.frame = CGRect(origin: .zero, size: view.frame.size)
+        previewView.layer.cornerRadius = view.layer.cornerRadius
+        previewView.layer.masksToBounds = view.layer.masksToBounds
+        
+        for subview in view.subviews {
+            let subviewCopy = subview.snapshotView(afterScreenUpdates: true)!
+            subviewCopy.frame = subview.frame
+            previewView.addSubview(subviewCopy)
+        }
+        previewController.view.addSubview(previewView)
+        return previewController
+    }
+    
+    func showAlert(for selectedTracker: Tracker) {
+        let alert = UIAlertController(title: nil, message: "Уверены что хотите удалить трекер?", preferredStyle: .actionSheet)
+        let deleteAction = UIAlertAction(title: "Удалить", style: .destructive) { [weak self] _ in
+            guard let self = self else { return }
+            self.viewModel?.deleteTracker(selectedTracker)
+            self.checkTrackersIsEmpty()
+            self.reloadVisibleCategories(text: "", date: self.currentDate)
+        }
+    
+        let cancelAction = UIAlertAction(title: "Отменить", style: .cancel) { [weak self] _ in
+            guard let self = self else { return }
+            self.dismiss(animated: true)
+        }
+        alert.addAction(deleteAction)
+        alert.addAction(cancelAction)
+        present(alert, animated: true, completion: nil)
     }
     
     // MARK: - @objc Function
@@ -239,6 +308,14 @@ final class TrackersViewController: UIViewController {
         let createTrackerVC = CreateTrackerViewController()
         createTrackerVC.delegate = self
         let navVC = UINavigationController(rootViewController: createTrackerVC)
+        present(navVC, animated: true)
+    }
+    
+    @objc private func filterButtonTapped() {
+        let filtersVC = FiltersViewController()
+        filtersVC.delegate = self
+        filtersVC.selectedFilter = self.savedFilter
+        let navVC = UINavigationController(rootViewController: filtersVC)
         present(navVC, animated: true)
     }
 }
@@ -262,11 +339,11 @@ extension TrackersViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? TrackerCell else { return UICollectionViewCell() }
-        let cellData = visibleCategories
-        let tracker = cellData[indexPath.section].trackers[indexPath.row]
+        let category = visibleCategories[indexPath.section]
+        let tracker = category.trackers[indexPath.row]
         cell.delegate = self
         let completedDays = viewModel?.completedDays(for: tracker.id)
-        cell.configure(with: tracker, isCompletedToday: completedDays?.completed ?? false, completedDays: completedDays?.number ?? 0, indexPath: indexPath)
+        cell.configure(with: tracker, category: category.title, isCompletedToday: completedDays?.completed ?? false, completedDays: completedDays?.number ?? 0, indexPath: indexPath)
         return cell
     }
 }
@@ -285,6 +362,42 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         return CGSize(width: collectionView.frame.width, height: 30)
     }
+    
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
+        guard let selectedIndexPath = indexPaths.first else { return nil }
+        let selectedTrackerCategory = visibleCategories[selectedIndexPath.section]
+        let selectedTracker = selectedTrackerCategory.trackers[selectedIndexPath.item]
+        let cell = collectionView.cellForItem(at: indexPaths[0]) as! TrackerCell
+        
+        let configuration = UIContextMenuConfiguration(identifier: nil, previewProvider: {
+            return self.createPreview(for: cell.mainView)
+        }) { _ in
+            let title = selectedTrackerCategory.title == "Закрепленные" ? "Открепить" : "Закрепить"
+            let pinAction = UIAction(title: title, image: nil) { [weak self] _ in
+                guard let self = self else { return }
+                self.viewModel?.togglePin(selectedTracker)
+                self.checkTrackersIsEmpty()
+                self.reloadVisibleCategories(text: "", date: self.currentDate)
+            }
+            let editAction = UIAction(title: "Редактировать", image: nil) { [weak self] _ in
+                guard let self = self else { return }
+                let trackerEditViewController = NewHabitOrEventViewController()
+                trackerEditViewController.eventMode = selectedTracker.dateEvent != nil
+                trackerEditViewController.categoryTitle = selectedTrackerCategory.title
+                trackerEditViewController.editingTracker = selectedTracker
+                trackerEditViewController.daysCounter = cell.counterLabel.text
+                trackerEditViewController.editingDelegate = self
+                let navVC = UINavigationController(rootViewController: trackerEditViewController)
+                self.present(navVC, animated: true)
+            }
+            let deleteAction = UIAction(title: "Удалить", image: nil, attributes: .destructive) { [weak self] _ in
+                guard let self = self else { return }
+                self.showAlert(for: selectedTracker)
+            }
+            return UIMenu(title: "", children: [pinAction, editAction, deleteAction])
+        }
+        return configuration
+    }
 }
 
 // MARK: - Extension UUITextFieldDelegate
@@ -300,16 +413,16 @@ extension TrackersViewController: UITextFieldDelegate {
 extension TrackersViewController: TrackerCellDelegate {
     func completeTracker(id: UUID, at indexPath: IndexPath) {
         viewModel?.completeTracker(id: id, date: currentDate)
-        trackersCollectionView.reloadItems(at: [indexPath])
+        self.reloadVisibleCategories(text: "", date: currentDate)
     }
 }
 
 // MARK: - Extension CreateTrackerViewControllerDelegate
-extension TrackersViewController: CreateTrackerViewControllerDelegate {
-    func addNewTrackers(newTracker: TrackerCategory) {
+extension TrackersViewController: CreateTrackerViewControllerDelegate, NewHabitOrEventViewControllerDelegate {
+    func addNewTracker(newTracker: TrackerCategory) {
         let trackerOrEvent = addDateForEvent(newTracker: newTracker)
-        isCategoriesEmpty = false
         viewModel?.addNewTracker(trackerOrEvent.trackers[0], with: trackerOrEvent)
+        self.trackersIsEmpty = visibleCategories.isEmpty
     }
     
     private func addDateForEvent(newTracker: TrackerCategory) -> TrackerCategory {
@@ -325,4 +438,25 @@ extension TrackersViewController: CreateTrackerViewControllerDelegate {
     }
 }
 
-
+// MARK: - Extension CreateTrackerViewControllerDelegate
+extension TrackersViewController: FiltersViewControllerDelegate {
+    func useSelectedFilter(selectedFilter: Filters) {
+        savedFilter = selectedFilter
+        switch selectedFilter {
+        case Filters.todayTrackers:
+            completedFilter = nil
+            datePicker.date = Date()
+            self.reloadData()
+        case Filters.completedTrackers:
+            completedFilter = true
+            self.reloadVisibleCategories(text: "", date: currentDate)
+        case Filters.unCompletedTrackers:
+            completedFilter = false
+            self.reloadVisibleCategories(text: "", date: currentDate)
+        default:
+            completedFilter = nil
+            self.reloadData()
+        }
+    }
+ 
+}

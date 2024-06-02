@@ -3,7 +3,7 @@ import Foundation
 import UIKit
 
 protocol CreateTrackerViewControllerDelegate: AnyObject {
-    func addNewTrackers(newTracker: TrackerCategory)
+    func addNewTracker(newTracker: TrackerCategory)
 }
 
 final class CreateTrackerViewController: UIViewController {
@@ -99,7 +99,7 @@ final class CreateTrackerViewController: UIViewController {
 // MARK: - Extension NewHabitOrEventViewControllerDelegate
 extension CreateTrackerViewController: NewHabitOrEventViewControllerDelegate {
     func addNewTracker(newTracker: TrackerCategory) {
-        delegate?.addNewTrackers(newTracker: newTracker)
+        delegate?.addNewTracker(newTracker: newTracker)
         if let navController = self.navigationController {
             navController.dismiss(animated: true, completion: nil)
             dismiss(animated: true, completion: nil)

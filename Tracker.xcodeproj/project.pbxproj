@@ -26,6 +26,9 @@
 		5D7AC2402BE1BC0D001027D9 /* OnboardingFirstViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D7AC23F2BE1BC0D001027D9 /* OnboardingFirstViewController.swift */; };
 		5D7AC2422BE29CDE001027D9 /* OnboardingSecondViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D7AC2412BE29CDE001027D9 /* OnboardingSecondViewController.swift */; };
 		5DAA6C0E2BF0491800917093 /* EditingCategoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAA6C0D2BF0491800917093 /* EditingCategoryViewController.swift */; };
+		5DAA6C362C038E9D00917093 /* FiltersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAA6C352C038E9D00917093 /* FiltersViewController.swift */; };
+		5DAA6C382C05403200917093 /* Filters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAA6C372C05403200917093 /* Filters.swift */; };
+		5DAA6C3A2C0A79AD00917093 /* TrackerForStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAA6C392C0A79AD00917093 /* TrackerForStatistics.swift */; };
 		5DC39B9B2BA770F500F6CDB7 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DC39B9A2BA770F500F6CDB7 /* TabBarController.swift */; };
 		5DC39B9D2BA771F000F6CDB7 /* StatisticsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DC39B9C2BA771F000F6CDB7 /* StatisticsViewController.swift */; };
 		5DC39C0E2BB5F8EE00F6CDB7 /* Tracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DC39C0D2BB5F8EE00F6CDB7 /* Tracker.swift */; };
@@ -63,6 +66,9 @@
 		5D7AC23F2BE1BC0D001027D9 /* OnboardingFirstViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingFirstViewController.swift; sourceTree = "<group>"; };
 		5D7AC2412BE29CDE001027D9 /* OnboardingSecondViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingSecondViewController.swift; sourceTree = "<group>"; };
 		5DAA6C0D2BF0491800917093 /* EditingCategoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditingCategoryViewController.swift; sourceTree = "<group>"; };
+		5DAA6C352C038E9D00917093 /* FiltersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiltersViewController.swift; sourceTree = "<group>"; };
+		5DAA6C372C05403200917093 /* Filters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Filters.swift; sourceTree = "<group>"; };
+		5DAA6C392C0A79AD00917093 /* TrackerForStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerForStatistics.swift; sourceTree = "<group>"; };
 		5DC39B9A2BA770F500F6CDB7 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 		5DC39B9C2BA771F000F6CDB7 /* StatisticsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsViewController.swift; sourceTree = "<group>"; };
 		5DC39C0D2BB5F8EE00F6CDB7 /* Tracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tracker.swift; sourceTree = "<group>"; };
@@ -110,6 +116,7 @@
 			children = (
 				5DC39B9C2BA771F000F6CDB7 /* StatisticsViewController.swift */,
 				5D267B492BBB93340011457C /* TrackersViewController */,
+				5DAA6C352C038E9D00917093 /* FiltersViewController.swift */,
 				5DC39C172BB8D23B00F6CDB7 /* CreateTrackerViewController.swift */,
 				5D7732182BBCF01800E3476D /* NewHabitOrEventViewController */,
 			);
@@ -189,7 +196,9 @@
 				5DC39C0D2BB5F8EE00F6CDB7 /* Tracker.swift */,
 				5DC39C0F2BB5F92000F6CDB7 /* TrackerCategory.swift */,
 				5DC39C112BB5F95400F6CDB7 /* TrackerRecord.swift */,
+				5DAA6C392C0A79AD00917093 /* TrackerForStatistics.swift */,
 				5DC39C202BB8E4F700F6CDB7 /* Weekdays.swift */,
+				5DAA6C372C05403200917093 /* Filters.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -331,15 +340,18 @@
 				5DC39C212BB8E4F700F6CDB7 /* Weekdays.swift in Sources */,
 				5DC39C122BB5F95400F6CDB7 /* TrackerRecord.swift in Sources */,
 				5DD2DB2B2B9FC4D000EF1636 /* AppDelegate.swift in Sources */,
+				5DAA6C3A2C0A79AD00917093 /* TrackerForStatistics.swift in Sources */,
 				5DD2DB2D2B9FC4D000EF1636 /* SceneDelegate.swift in Sources */,
 				5DAA6C0E2BF0491800917093 /* EditingCategoryViewController.swift in Sources */,
 				5D784AF92BEF990D00505F9A /* ListOfCategoriesViewController.swift in Sources */,
 				5D784AE12BED33CC00505F9A /* TrackersViewModel.swift in Sources */,
 				5D7AC2402BE1BC0D001027D9 /* OnboardingFirstViewController.swift in Sources */,
+				5DAA6C382C05403200917093 /* Filters.swift in Sources */,
 				5D7AC2422BE29CDE001027D9 /* OnboardingSecondViewController.swift in Sources */,
 				5D7AC1E72BD1EE17001027D9 /* TrackerRecordStore.swift in Sources */,
 				5DC39C0E2BB5F8EE00F6CDB7 /* Tracker.swift in Sources */,
 				5D267B462BBB30A00011457C /* NewHabitOrEventViewController.swift in Sources */,
+				5DAA6C362C038E9D00917093 /* FiltersViewController.swift in Sources */,
 				5D7AC1DB2BCB518A001027D9 /* ColorCollectionCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
