@@ -2,13 +2,13 @@
 import Foundation
 
 enum Weekdays: String, CaseIterable, Codable {
-    case Monday = "Понедельник"
-    case Tuesday = "Вторник"
-    case Wednesday = "Среда"
-    case Thursday = "Четверг"
-    case Friday = "Пятница"
-    case Saturday = "Суббота"
-    case Sunday = "Воскресенье"
+    case Monday = "Monday"
+    case Tuesday = "Tuesday"
+    case Wednesday = "Wednesday"
+    case Thursday = "Thursday"
+    case Friday = "Friday"
+    case Saturday = "Saturday"
+    case Sunday = "Sunday"
     
     var numberValue: Int {
         switch self {
@@ -32,19 +32,19 @@ enum Weekdays: String, CaseIterable, Codable {
     var shortDayName: String {
         switch self {
         case .Monday:
-            return "Пн"
+            return "Mon"
         case .Tuesday:
-            return "Вт"
+            return "Tue"
         case .Wednesday:
-            return "Ср"
+            return "Wed"
         case .Thursday:
-            return "Чт"
+            return "Thu"
         case . Friday:
-            return "Пт"
+            return "Fri"
         case .Saturday:
-            return "Сб"
+            return "Sat"
         case .Sunday:
-            return "Вс"
+            return "Sun"
         }
     }
     

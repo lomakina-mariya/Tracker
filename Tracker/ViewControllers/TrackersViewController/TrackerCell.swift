@@ -110,7 +110,7 @@ final class TrackerCell: UICollectionViewCell {
         plusButton.setImage(image, for: .normal)
         pinImageView.image = category == "Закрепленные" ? UIImage(named: "pin") : .none
         
-        counterLabel.text = completedDays.days()
+        counterLabel.text = completedDays.days().localized
     }
     
     //MARK: - Private Function

@@ -52,7 +52,7 @@ final class FiltersViewController: UIViewController {
     
     private func createNavigationBar() {
         guard let navigationBar = navigationController?.navigationBar else { return }
-        navigationBar.topItem?.title = "Фильтры"
+        navigationBar.topItem?.title = "buttonFilters.title".localized
     }
     
     private func createSeparatorImageView(cell: UITableViewCell) {
@@ -80,7 +80,7 @@ extension FiltersViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         cell.backgroundColor = .ypLightGray.withAlphaComponent(0.3)
-        cell.textLabel?.text = filtersArray[indexPath.row].rawValue
+        cell.textLabel?.text = filtersArray[indexPath.row].rawValue.localized
         cell.accessoryView = nil
         if filtersArray[indexPath.row] == selectedFilter {
             selectedIndexPath = indexPath

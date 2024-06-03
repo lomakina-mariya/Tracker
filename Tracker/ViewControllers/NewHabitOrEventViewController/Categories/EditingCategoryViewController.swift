@@ -27,7 +27,7 @@ final class EditingCategoryViewController: UIViewController {
     private  lazy var saveCategoryButton: UIButton = {
         let button = UIButton()
         button.backgroundColor = .ypGray
-        button.setTitle("Готово", for: .normal)
+        button.setTitle("readyButton.Title".localized, for: .normal)
         button.tintColor = .ypWhite
         button.titleLabel?.textAlignment = .center
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
@@ -76,7 +76,7 @@ final class EditingCategoryViewController: UIViewController {
     
     private func createNavigationBar() {
         guard let navigationBar = navigationController?.navigationBar else { return }
-        navigationBar.topItem?.title = "Редактирование категории"
+        navigationBar.topItem?.title = "editingCategory.title".localized
     }
     
     //MARK: - @objc Function

@@ -38,7 +38,7 @@ final class NewHabitOrEventViewController: UIViewController {
         textField.tintColor = .ypBlack
         textField.font = .systemFont(ofSize: 17, weight: .regular)
         textField.translatesAutoresizingMaskIntoConstraints = false
-        textField.placeholder = "Введите название трекера"
+        textField.placeholder = "createTrackers.placeholder".localized
         textField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: textField.frame.height))
         textField.leftViewMode = .always
         textField.clearButtonMode = .whileEditing
@@ -51,7 +51,7 @@ final class NewHabitOrEventViewController: UIViewController {
     
     private lazy var restrictiveLabel: UILabel = {
         let label = UILabel()
-        label.text = "Ограничение 38 символов"
+        label.text = "restrictiveLabel".localized
         label.textColor = .ypRed
         label.textAlignment = .center
         label.font = .systemFont(ofSize: 17, weight: .regular)
@@ -75,7 +75,7 @@ final class NewHabitOrEventViewController: UIViewController {
         let button = UIButton()
         button.backgroundColor = .ypGray
         button.isEnabled = false
-        button.setTitle("Создать", for: .normal)
+        button.setTitle("Create".localized, for: .normal)
         button.tintColor = .ypWhite
         button.titleLabel?.textAlignment = .center
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
@@ -89,7 +89,7 @@ final class NewHabitOrEventViewController: UIViewController {
     private lazy var cancelButton: UIButton = {
         let button = UIButton(type: .system)
         button.backgroundColor = .white
-        button.setTitle("Отменить", for: .normal)
+        button.setTitle("cancel".localized, for: .normal)
         button.tintColor = .ypRed
         button.layer.borderWidth = 1
         button.layer.borderColor = UIColor.ypRed.cgColor
@@ -130,7 +130,7 @@ final class NewHabitOrEventViewController: UIViewController {
     
     private lazy var colorLabel: UILabel = {
         let label = UILabel()
-        label.text = "Цвет"
+        label.text = "colorLabel".localized
         label.textColor = .ypBlack
         label.font = .systemFont(ofSize: 19, weight: .bold)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -284,7 +284,7 @@ final class NewHabitOrEventViewController: UIViewController {
             
             colorLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 28),
             colorLabel.topAnchor.constraint(equalTo: emojiCollection.bottomAnchor, constant: 16),
-            colorLabel.widthAnchor.constraint(equalToConstant: 48),
+            colorLabel.widthAnchor.constraint(equalToConstant: 52),
             colorLabel.heightAnchor.constraint(equalToConstant: 18),
             
             colorCollection.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
@@ -308,9 +308,9 @@ final class NewHabitOrEventViewController: UIViewController {
     private func createNavigationBar() {
         guard let navigationBar = navigationController?.navigationBar else { return }
         if editingTracker != nil {
-            navigationBar.topItem?.title = "Редактирование привычки"
+            navigationBar.topItem?.title = "editingTracker.title".localized
         } else {
-            navigationBar.topItem?.title = eventMode ? "Новое нерегулярное событие" : "Новая привычка"
+            navigationBar.topItem?.title = eventMode ? "newEvent.title".localized : "newHabit.title".localized
         }
     }
     
@@ -382,7 +382,7 @@ extension NewHabitOrEventViewController: UITableViewDataSource {
         }
         cell.configure(indexPath: indexPath)
         if indexPath.row == 1 {
-            let detailsText = schedule.count == 7 ? "Каждый день" : schedule.map { $0!.shortDayName }.joined(separator: ", ")
+            let detailsText = schedule.count == 7 ? "detailsText".localized : schedule.map { $0!.shortDayName.localized }.joined(separator: ", ")
             cell.setup(detailsText: detailsText)
         } else {
             cell.setup(detailsText: categoryTitle)

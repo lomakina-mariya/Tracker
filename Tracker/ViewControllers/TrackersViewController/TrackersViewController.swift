@@ -49,7 +49,7 @@ final class TrackersViewController: UIViewController {
     
     private lazy var stubLabel: UILabel = {
         let label = UILabel()
-        label.text = "Что будем отслеживать?"
+        label.text = "stubLabel.text".localized
         label.font = .systemFont(ofSize: 12, weight: .medium)
         label.numberOfLines = 2
         label.textAlignment = .center
@@ -67,7 +67,7 @@ final class TrackersViewController: UIViewController {
     
     private lazy var notFoundLabel: UILabel = {
         let label = UILabel()
-        label.text = "Ничего не найдено"
+        label.text = "notFoundLabel.text".localized
         label.font = .systemFont(ofSize: 12, weight: .medium)
         label.numberOfLines = 2
         label.textAlignment = .center
@@ -82,7 +82,7 @@ final class TrackersViewController: UIViewController {
         textField.tintColor = .ypBlack
         textField.font = .systemFont(ofSize: 17, weight: .medium)
         textField.translatesAutoresizingMaskIntoConstraints = false
-        textField.placeholder = "Поиск"
+        textField.placeholder = "searchTrackerTextField.placeholder".localized
         textField.backgroundColor = .clear
         textField.delegate = self
         return textField
@@ -102,7 +102,7 @@ final class TrackersViewController: UIViewController {
         return dpicker
     }()
     
-    private lazy var trackersCollectionView: UICollectionView = {
+    lazy var trackersCollectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
         collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 60, right: 0)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -114,7 +114,7 @@ final class TrackersViewController: UIViewController {
     private lazy var filterButton: UIButton = {
         let button = UIButton()
         button.backgroundColor = .ypBlue
-        button.setTitle("Фильтры", for: .normal)
+        button.setTitle("buttonFilters.title".localized, for: .normal)
         button.tintColor = .ypWhite
         button.titleLabel?.textAlignment = .center
         button.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: .regular)
@@ -224,7 +224,7 @@ final class TrackersViewController: UIViewController {
     
     private func createNavigationBar() {
         guard let navigationBar = navigationController?.navigationBar else { return }
-        navigationBar.topItem?.title = "Трекеры"
+        navigationBar.topItem?.title = "trackers.title".localized
         navigationBar.prefersLargeTitles = true
         navigationBar.topItem?.largeTitleDisplayMode = .always
         
@@ -247,7 +247,6 @@ final class TrackersViewController: UIViewController {
     
     private func reloadVisibleCategories(text: String?, date: Date) {
         viewModel?.updateStore(with: date, text: text ?? "", completedFilter: self.completedFilter)
-        //reloadPlaceholder()
     }
     
     private func checkTrackersIsEmpty() {
@@ -281,15 +280,15 @@ final class TrackersViewController: UIViewController {
     }
     
     func showAlert(for selectedTracker: Tracker) {
-        let alert = UIAlertController(title: nil, message: "Уверены что хотите удалить трекер?", preferredStyle: .actionSheet)
-        let deleteAction = UIAlertAction(title: "Удалить", style: .destructive) { [weak self] _ in
+        let alert = UIAlertController(title: nil, message: "delete.confirmation".localized, preferredStyle: .actionSheet)
+        let deleteAction = UIAlertAction(title: "delete".localized, style: .destructive) { [weak self] _ in
             guard let self = self else { return }
             self.viewModel?.deleteTracker(selectedTracker)
             self.checkTrackersIsEmpty()
             self.reloadVisibleCategories(text: "", date: self.currentDate)
         }
     
-        let cancelAction = UIAlertAction(title: "Отменить", style: .cancel) { [weak self] _ in
+        let cancelAction = UIAlertAction(title: "cancel".localized, style: .cancel) { [weak self] _ in
             guard let self = self else { return }
             self.dismiss(animated: true)
         }
@@ -372,14 +371,14 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
         let configuration = UIContextMenuConfiguration(identifier: nil, previewProvider: {
             return self.createPreview(for: cell.mainView)
         }) { _ in
-            let title = selectedTrackerCategory.title == "Закрепленные" ? "Открепить" : "Закрепить"
+            let title = selectedTrackerCategory.title == "Закрепленные" ? "unpin".localized : "pin".localized
             let pinAction = UIAction(title: title, image: nil) { [weak self] _ in
                 guard let self = self else { return }
                 self.viewModel?.togglePin(selectedTracker)
                 self.checkTrackersIsEmpty()
                 self.reloadVisibleCategories(text: "", date: self.currentDate)
             }
-            let editAction = UIAction(title: "Редактировать", image: nil) { [weak self] _ in
+            let editAction = UIAction(title: "edit".localized, image: nil) { [weak self] _ in
                 guard let self = self else { return }
                 let trackerEditViewController = NewHabitOrEventViewController()
                 trackerEditViewController.eventMode = selectedTracker.dateEvent != nil
@@ -390,7 +389,7 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
                 let navVC = UINavigationController(rootViewController: trackerEditViewController)
                 self.present(navVC, animated: true)
             }
-            let deleteAction = UIAction(title: "Удалить", image: nil, attributes: .destructive) { [weak self] _ in
+            let deleteAction = UIAction(title: "delete".localized, image: nil, attributes: .destructive) { [weak self] _ in
                 guard let self = self else { return }
                 self.showAlert(for: selectedTracker)
             }

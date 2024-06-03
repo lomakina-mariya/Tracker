@@ -12,7 +12,7 @@ final class CreateTrackerViewController: UIViewController {
     private  lazy var habitButton: UIButton = {
         let button = UIButton()
         button.backgroundColor = .ypBlack
-        button.setTitle("Привычка", for: .normal)
+        button.setTitle("buttonНabit.title".localized, for: .normal)
         button.tintColor = .ypWhite
         button.titleLabel?.textColor = .ypWhite
         button.titleLabel?.textAlignment = .center
@@ -27,7 +27,7 @@ final class CreateTrackerViewController: UIViewController {
     private  lazy var irregularEventsButton: UIButton = {
         let button = UIButton()
         button.backgroundColor = .ypBlack
-        button.setTitle("Нерегулярные событие", for: .normal)
+        button.setTitle("buttonEvent.title".localized, for: .normal)
         button.tintColor = .ypWhite
         button.titleLabel?.textColor = .ypWhite
         button.titleLabel?.textAlignment = .center
@@ -75,7 +75,7 @@ final class CreateTrackerViewController: UIViewController {
     
     private func createNavigationBar() {
         guard let navigationBar = navigationController?.navigationBar else { return }
-        navigationBar.topItem?.title = "Создание трекера"
+        navigationBar.topItem?.title = "createTrackers.title".localized
     }
     
     // MARK: - @objc Function

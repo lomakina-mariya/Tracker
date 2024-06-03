@@ -12,7 +12,7 @@ final class ScheduleViewController: UIViewController {
     private  lazy var saveDaysButton: UIButton = {
         let button = UIButton()
         button.backgroundColor = .ypBlack
-        button.setTitle("Готово", for: .normal)
+        button.setTitle("readyButton.Title".localized, for: .normal)
         button.tintColor = .ypWhite
         button.titleLabel?.textAlignment = .center
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
@@ -75,7 +75,7 @@ final class ScheduleViewController: UIViewController {
     
     private func createNavigationBar() {
         guard let navigationBar = navigationController?.navigationBar else { return }
-        navigationBar.topItem?.title = "Расписание"
+        navigationBar.topItem?.title = "scheduleTitle".localized
     }
     
     private func setupSwitches() {
@@ -128,7 +128,7 @@ extension ScheduleViewController: UITableViewDataSource {
         if indexPath.row == 6 {
             cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
         }
-        cell.textLabel?.text = weekdays[indexPath.row].rawValue
+        cell.textLabel?.text = weekdays[indexPath.row].rawValue.localized
         cell.accessoryView = switches[indexPath.row]
         return cell
     }

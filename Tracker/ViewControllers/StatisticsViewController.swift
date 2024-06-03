@@ -19,7 +19,7 @@ final class StatisticsViewController: UIViewController {
     
     private lazy var stubLabel: UILabel = {
         let label = UILabel()
-        label.text = "Анализировать пока нечего"
+        label.text = "statisticsStubLabel.text".localized
         label.font = .systemFont(ofSize: 12, weight: .medium)
         label.textAlignment = .center
         label.textColor = UIColor(named: "Black")
@@ -45,7 +45,7 @@ final class StatisticsViewController: UIViewController {
     
     private let bestPeriodTextLabel: UILabel = {
         let label = UILabel()
-        label.text = "Лучший период"
+        label.text = "bestPeriodTextLabel".localized
         label.textColor = .ypBlack
         label.font = .systemFont(ofSize: 12, weight: .medium)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -70,7 +70,7 @@ final class StatisticsViewController: UIViewController {
     
     private let idealDaysTextLabel: UILabel = {
         let label = UILabel()
-        label.text = "Идеальные дни"
+        label.text = "idealDaysTextLabel".localized
         label.textColor = .ypBlack
         label.font = .systemFont(ofSize: 12, weight: .medium)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -95,7 +95,7 @@ final class StatisticsViewController: UIViewController {
     
     private let trackersCompletedTextLabel: UILabel = {
         let label = UILabel()
-        label.text = "Трекеров завершено"
+        label.text = "trackersCompletedTextLabel".localized
         label.textColor = .ypBlack
         label.font = .systemFont(ofSize: 12, weight: .medium)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -120,7 +120,7 @@ final class StatisticsViewController: UIViewController {
     
     private let averageValueTextLabel: UILabel = {
         let label = UILabel()
-        label.text = "Среднее значениe"
+        label.text = "averageValueTextLabel".localized
         label.textColor = .ypBlack
         label.font = .systemFont(ofSize: 12, weight: .medium)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -129,7 +129,7 @@ final class StatisticsViewController: UIViewController {
     
     private lazy var navigationBar: UINavigationBar = {
         let navigationBar = navigationController?.navigationBar ?? UINavigationBar()
-        navigationBar.topItem?.title = "Статистика"
+        navigationBar.topItem?.title = "statistics.title".localized
         navigationBar.prefersLargeTitles = true
         navigationBar.topItem?.largeTitleDisplayMode = .always
         return navigationBar

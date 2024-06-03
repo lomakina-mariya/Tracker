@@ -2,8 +2,8 @@
 import Foundation
 
 enum Filters: String, CaseIterable {
-    case allTrackers = "Все трекеры"
-    case todayTrackers = "Трекеры на сегодня"
-    case completedTrackers = "Завершенные"
-    case unCompletedTrackers = "Не завершенные"
+    case allTrackers = "allTrackers"
+    case todayTrackers = "todayTrackers"
+    case completedTrackers = "completedTrackers"
+    case unCompletedTrackers = "unCompletedTrackers"
 }

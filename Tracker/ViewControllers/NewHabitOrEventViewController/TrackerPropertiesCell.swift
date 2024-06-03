@@ -11,7 +11,7 @@ final class TrackerPropertiesCell: UITableViewCell {
     //MARK: - Properties
     private let propertiesTitleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Категория"
+        label.text = "categoryTitle".localized
         label.textColor = .ypBlack
         label.font = .systemFont(ofSize: 17, weight: .regular)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -42,7 +42,7 @@ final class TrackerPropertiesCell: UITableViewCell {
         return button
     }()
     
-    private let properties = ["Категория", "Расписание"]
+    private let properties = ["categoryTitle".localized, "scheduleTitle".localized]
     private var indexPath: IndexPath?
     weak var delegate: TrackerPropertiesCellDelegate?
     

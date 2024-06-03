@@ -6,12 +6,14 @@ extension Int {
         let remainder10 = self % 10
         let remainder100 = self % 100
         
-        if remainder10 == 1 && remainder100 != 11 {
-            return "\(self) день"
+        if self == 1 {
+            return "\(self) \("day1".localized)"
+        } else if remainder10 == 1 && remainder100 != 11 {
+            return "\(self) \("day0".localized)"
         } else if remainder10 >= 2 && remainder10 <= 4 && (remainder100 < 10 || remainder100 >= 20) {
-            return "\(self) дня"
+            return "\(self) \("day2".localized)"
         } else {
-            return "\(self) дней"
+            return "\(self) \("days".localized)"
         }
     }
 }

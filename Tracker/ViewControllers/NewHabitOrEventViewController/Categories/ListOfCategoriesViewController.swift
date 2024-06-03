@@ -29,7 +29,7 @@ final class ListOfCategoriesViewController: UIViewController {
     
     private lazy var stubLabel: UILabel = {
         let label = UILabel()
-        label.text = "Привычки и события можно объединить по смыслу"
+        label.text = "categoryStubLabel".localized
         label.font = .systemFont(ofSize: 12, weight: .medium)
         label.numberOfLines = 2
         label.textAlignment = .center
@@ -41,7 +41,7 @@ final class ListOfCategoriesViewController: UIViewController {
     private  lazy var addCategoryButton: UIButton = {
         let button = UIButton()
         button.backgroundColor = .ypBlack
-        button.setTitle("Добавить категорию", for: .normal)
+        button.setTitle("buttonAddCategory".localized, for: .normal)
         button.tintColor = .ypWhite
         button.titleLabel?.textAlignment = .center
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
@@ -105,7 +105,7 @@ final class ListOfCategoriesViewController: UIViewController {
     
     private func createNavigationBar() {
         guard let navigationBar = navigationController?.navigationBar else { return }
-        navigationBar.topItem?.title = "Категория"
+        navigationBar.topItem?.title = "categoryTitle".localized
     }
     
     private func conditionStubs() {
@@ -207,7 +207,7 @@ extension ListOfCategoriesViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
         let configuration = UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
-            let editAction = UIAction(title: "Редактировать", image: nil) { [weak self] _ in
+            let editAction = UIAction(title: "edit".localized, image: nil) { [weak self] _ in
                 guard let self = self else { return }
                 self.editingIndex = indexPath.row
                 let editingCategoryVC = EditingCategoryViewController()
@@ -216,7 +216,7 @@ extension ListOfCategoriesViewController: UITableViewDelegate {
                 let navVC = UINavigationController(rootViewController: editingCategoryVC)
                 self.present(navVC, animated: true)
             }
-            let deleteAction = UIAction(title: "Удалить", image: nil, attributes: .destructive) { [weak self] _ in
+            let deleteAction = UIAction(title: "delete".localized, image: nil, attributes: .destructive) { [weak self] _ in
                 guard let self = self else { return }
                 self.categoriesArray.remove(at: indexPath.row)
                 UserDefaults.standard.set(self.categoriesArray, forKey: "categoriesArray")
