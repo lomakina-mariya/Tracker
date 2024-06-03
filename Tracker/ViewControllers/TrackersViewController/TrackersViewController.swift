@@ -83,6 +83,12 @@ final class TrackersViewController: UIViewController {
         textField.font = .systemFont(ofSize: 17, weight: .medium)
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.placeholder = "searchTrackerTextField.placeholder".localized
+        if traitCollection.userInterfaceStyle == .dark {
+            textField.attributedPlaceholder = NSAttributedString(
+                string: "searchTrackerTextField.placeholder".localized,
+                attributes: [NSAttributedString.Key.foregroundColor: UIColor.white]
+                )
+        }
         textField.backgroundColor = .clear
         textField.delegate = self
         return textField
@@ -94,6 +100,8 @@ final class TrackersViewController: UIViewController {
         dpicker.preferredDatePickerStyle = .compact
         dpicker.locale = Locale(identifier: "ru_RU")
         dpicker.calendar.firstWeekday = 2
+        dpicker.layer.cornerRadius = 8
+        dpicker.clipsToBounds = true
         dpicker.tintColor = .ypBlue
         dpicker.addTarget(self, action: #selector(datePickerValueChanged), for: .valueChanged)
         dpicker.translatesAutoresizingMaskIntoConstraints = false
@@ -104,6 +112,7 @@ final class TrackersViewController: UIViewController {
     
     lazy var trackersCollectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+        collectionView.backgroundColor = .ypWhite
         collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 60, right: 0)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.register(TrackerCell.self, forCellWithReuseIdentifier: "cell")

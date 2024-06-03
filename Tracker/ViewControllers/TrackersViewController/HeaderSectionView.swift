@@ -10,7 +10,7 @@ class HeaderSectionView: UICollectionReusableView {
         
         addSubview(titleLabel)
         titleLabel.textAlignment = .left
-        titleLabel.textColor = .black
+        titleLabel.textColor = .ypBlack
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.font = .systemFont(ofSize: 19, weight: .bold)
         

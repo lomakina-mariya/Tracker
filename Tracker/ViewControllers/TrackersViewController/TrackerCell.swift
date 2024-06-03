@@ -20,7 +20,7 @@ final class TrackerCell: UICollectionViewCell {
     private let taskTitleLabel: UILabel = {
         let label = UILabel()
         label.text = "Уборка"
-        label.textColor = .ypWhite
+        label.textColor = .white
         label.font = .systemFont(ofSize: 12, weight: .medium)
         label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false

@@ -76,7 +76,7 @@ final class NewHabitOrEventViewController: UIViewController {
         button.backgroundColor = .ypGray
         button.isEnabled = false
         button.setTitle("Create".localized, for: .normal)
-        button.tintColor = .ypWhite
+        button.setTitleColor(.ypWhite, for: .normal)
         button.titleLabel?.textAlignment = .center
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.clipsToBounds = true
@@ -88,7 +88,7 @@ final class NewHabitOrEventViewController: UIViewController {
     
     private lazy var cancelButton: UIButton = {
         let button = UIButton(type: .system)
-        button.backgroundColor = .white
+        button.backgroundColor = .ypWhite
         button.setTitle("cancel".localized, for: .normal)
         button.tintColor = .ypRed
         button.layer.borderWidth = 1

@@ -29,7 +29,7 @@ final class NewCategoryViewController: UIViewController {
         let button = UIButton()
         button.backgroundColor = .ypGray
         button.setTitle("readyButton.Title".localized, for: .normal)
-        button.tintColor = .ypWhite
+        button.setTitleColor(.ypWhite, for: .normal)
         button.titleLabel?.textAlignment = .center
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.clipsToBounds = true

@@ -13,8 +13,7 @@ final class CreateTrackerViewController: UIViewController {
         let button = UIButton()
         button.backgroundColor = .ypBlack
         button.setTitle("buttonНabit.title".localized, for: .normal)
-        button.tintColor = .ypWhite
-        button.titleLabel?.textColor = .ypWhite
+        button.setTitleColor(.ypWhite, for: .normal)
         button.titleLabel?.textAlignment = .center
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.clipsToBounds = true
@@ -29,7 +28,7 @@ final class CreateTrackerViewController: UIViewController {
         button.backgroundColor = .ypBlack
         button.setTitle("buttonEvent.title".localized, for: .normal)
         button.tintColor = .ypWhite
-        button.titleLabel?.textColor = .ypWhite
+        button.setTitleColor(.ypWhite, for: .normal)
         button.titleLabel?.textAlignment = .center
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.clipsToBounds = true
