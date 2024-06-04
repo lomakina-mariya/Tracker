@@ -156,6 +156,17 @@ final class TrackersViewController: UIViewController {
         useSelectedFilter(selectedFilter: savedFilter ?? Filters.allTrackers)
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        viewModel?.screenOpen()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        let viewModel = TrackersViewModel()
+        viewModel.screenClose()
+    }
+    
     // MARK: - Private Function
     private func conditionStubs() {
         if trackersIsEmpty {
@@ -313,6 +324,7 @@ final class TrackersViewController: UIViewController {
     }
     
     @objc private func addTask() {
+        viewModel?.addButtonTapped()
         let createTrackerVC = CreateTrackerViewController()
         createTrackerVC.delegate = self
         let navVC = UINavigationController(rootViewController: createTrackerVC)
@@ -320,6 +332,7 @@ final class TrackersViewController: UIViewController {
     }
     
     @objc private func filterButtonTapped() {
+        viewModel?.filterButtonTapped()
         let filtersVC = FiltersViewController()
         filtersVC.delegate = self
         filtersVC.selectedFilter = self.savedFilter
@@ -389,6 +402,7 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
             }
             let editAction = UIAction(title: "edit".localized, image: nil) { [weak self] _ in
                 guard let self = self else { return }
+                self.viewModel?.editButtonTapped()
                 let trackerEditViewController = NewHabitOrEventViewController()
                 trackerEditViewController.eventMode = selectedTracker.dateEvent != nil
                 trackerEditViewController.categoryTitle = selectedTrackerCategory.title

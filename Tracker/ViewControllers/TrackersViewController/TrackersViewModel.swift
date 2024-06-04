@@ -10,6 +10,7 @@ final class TrackersViewModel {
     private var completedFilter: Bool?
     private var trackerStore = TrackerStore(date: Date.distantPast, text: "")
     private var trackerRecordStore = TrackerRecordStore()
+    private let analyticsService = AnalyticsService()
     private(set) var categories: [TrackerCategory] = [] {
         didSet {
             categoriesBinding?(categories)
@@ -28,7 +29,6 @@ final class TrackersViewModel {
         return trackerStore.trackersCategories
     }
     
-  
     func updateStore(with date: Date, text: String, completedFilter: Bool?) {
         currentDate = date
         self.text = text
@@ -48,10 +48,12 @@ final class TrackersViewModel {
     }
     
     func deleteTracker(_ tracker: Tracker) {
+        analyticsService.report(event: "click", params: ["screen" : "main", "item" : "delete"])
         try? trackerStore.deleteTracker(tracker)
     }
     
     func completeTracker(id: UUID, date: Date) {
+        analyticsService.report(event: "click", params: ["screen" : "main", "item" : "track"])
         do {
             try trackerRecordStore.addOrDeleteRecord(id: id, date: date)
         } catch {
@@ -62,6 +64,26 @@ final class TrackersViewModel {
     func togglePin(_ tracker: Tracker) {
         try? trackerStore.togglePin(tracker)
     }
+    
+    func screenOpen() {
+        analyticsService.report(event: "open", params: ["screen" : "main"])
+    }
+    
+    func screenClose() {
+        analyticsService.report(event: "close", params: ["screen" : "main"])
+    }
+    
+    func addButtonTapped() {
+        analyticsService.report(event: "click", params: ["screen" : "main", "item" : "add_track"])
+    }
+    
+    func filterButtonTapped() {
+        analyticsService.report(event: "click", params: ["screen" : "main", "item" : "filter"])
+    }
+    func editButtonTapped() {
+        analyticsService.report(event: "click", params: ["screen" : "main", "item" : "edit"])
+    }
+    
 }
 
 // MARK: - TrackerStoreDelegate
