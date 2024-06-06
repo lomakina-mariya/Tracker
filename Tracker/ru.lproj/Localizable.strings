@@ -43,10 +43,10 @@ Created by Mariya on 02.06.2024.
 "buttonAddCategory" = "Добавить категорию";
 "readyButton.Title" = "Готово";
 
-"day0" = "день";
-"day1" = "день";
-"day2" = "дня";
-"days" = "дней";
+"oneDay" = "день";
+"numberEndingOneWithoutEleven" = "день";
+"numberEndingFromTwoToFour" = "дня";
+"otherDaysNumber" = "дней";
 
 "allTrackers" = "Все трекеры";
 "todayTrackers" = "Трекеры на сегодня";

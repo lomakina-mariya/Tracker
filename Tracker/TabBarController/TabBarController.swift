@@ -16,7 +16,8 @@ final class TabBarController: UITabBarController {
     }
 
     func setTrackersViewController() -> UINavigationController {
-        let trackersViewController = TrackersViewController()
+        let viewModel = TrackersViewModel()
+        let trackersViewController = TrackersViewController(viewModel: viewModel)
         trackersViewController.tabBarItem = UITabBarItem(
             title: "trackers.title".localized,
             image: UIImage(named: "tab_trackers"),

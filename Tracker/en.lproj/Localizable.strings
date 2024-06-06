@@ -44,10 +44,10 @@ Created by Mariya on 02.06.2024.
 "buttonAddCategory" = "Add category";
 "readyButton.Title" = "Ready";
 
-"day0" = "days";
-"day1" = "day";
-"day2" = "days";
-"days" = "days";
+"oneDay" = "day";
+"numberEndingOneWithoutEleven" = "days";
+"numberEndingFromTwoToFour" = "days";
+"otherDaysNumber" = "days";
 
 "allTrackers" = "All trackers";
 "todayTrackers" = "Trackers for today";

@@ -35,15 +35,14 @@ final class TrackersViewController: UIViewController {
             conditionStubs()
         }
     }
-    private var viewModel: TrackersViewModel?
+    private var viewModel: TrackersViewModel
     private var visibleCategories: [TrackerCategory] {
-        return viewModel?.categories ?? [TrackerCategory]()
+        return viewModel.categories
     }
     private var savedFilter: Filters?
     private lazy var stubImageView: UIImageView = {
         let image = UIImage(named: "stub")
         let imageView = UIImageView(image: image)
-        imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
     
@@ -54,14 +53,12 @@ final class TrackersViewController: UIViewController {
         label.numberOfLines = 2
         label.textAlignment = .center
         label.textColor = .ypBlack
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     private lazy var notFoundImageView: UIImageView = {
         let image = UIImage(named: "notFoundImage")
         let imageView = UIImageView(image: image)
-        imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
     
@@ -72,7 +69,6 @@ final class TrackersViewController: UIViewController {
         label.numberOfLines = 2
         label.textAlignment = .center
         label.textColor = .ypBlack
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
@@ -81,7 +77,6 @@ final class TrackersViewController: UIViewController {
         textField.textColor = .ypBlack
         textField.tintColor = .ypBlack
         textField.font = .systemFont(ofSize: 17, weight: .medium)
-        textField.translatesAutoresizingMaskIntoConstraints = false
         textField.placeholder = "searchTrackerTextField.placeholder".localized
         if traitCollection.userInterfaceStyle == .dark {
             textField.attributedPlaceholder = NSAttributedString(
@@ -114,7 +109,6 @@ final class TrackersViewController: UIViewController {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
         collectionView.backgroundColor = .ypWhite
         collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 60, right: 0)
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.register(TrackerCell.self, forCellWithReuseIdentifier: "cell")
         collectionView.register(HeaderSectionView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header")
         return collectionView
@@ -129,10 +123,18 @@ final class TrackersViewController: UIViewController {
         button.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: .regular)
         button.clipsToBounds = true
         button.layer.cornerRadius = 16
-        button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(filterButtonTapped), for: .touchUpInside)
         return button
     }()
+    
+    init(viewModel: TrackersViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - Life Cycle
     override func viewDidLoad() {
@@ -140,7 +142,7 @@ final class TrackersViewController: UIViewController {
         view.backgroundColor = .ypWhite
         
         viewModel = TrackersViewModel()
-        viewModel?.categoriesBinding = { [weak self] _ in
+        viewModel.categoriesBinding = { [weak self] _ in
             guard let self = self else { return }
             self.reloadPlaceholder()
             self.trackersCollectionView.reloadData()
@@ -158,12 +160,11 @@ final class TrackersViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        viewModel?.screenOpen()
+        viewModel.screenOpen()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        let viewModel = TrackersViewModel()
         viewModel.screenClose()
     }
     
@@ -231,13 +232,17 @@ final class TrackersViewController: UIViewController {
     }
     
     private func addElements(){
-        view.addSubview(trackersCollectionView)
-        view.addSubview(stubImageView)
-        view.addSubview(stubLabel)
-        view.addSubview(searchTextField)
-        view.addSubview(notFoundImageView)
-        view.addSubview(notFoundLabel)
-        view.addSubview(filterButton)
+        [trackersCollectionView,
+         stubImageView,
+         stubLabel,
+         searchTextField,
+         notFoundImageView,
+         notFoundLabel,
+         filterButton].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview($0)
+        }
+        
         notFoundImageView.isHidden = true
         notFoundLabel.isHidden = true
     }
@@ -266,12 +271,12 @@ final class TrackersViewController: UIViewController {
     }
     
     private func reloadVisibleCategories(text: String?, date: Date) {
-        viewModel?.updateStore(with: date, text: text ?? "", completedFilter: self.completedFilter)
+        viewModel.updateStore(with: date, text: text ?? "", completedFilter: self.completedFilter)
     }
     
     private func checkTrackersIsEmpty() {
-        viewModel?.updateStore(with: Date.distantPast, text: "", completedFilter: nil)
-        self.trackersIsEmpty = viewModel?.categories.isEmpty ?? true
+        viewModel.updateStore(with: Date.distantPast, text: "", completedFilter: nil)
+        self.trackersIsEmpty = viewModel.categories.isEmpty
     }
     
     private func loadFilter() -> Filters {
@@ -282,28 +287,23 @@ final class TrackersViewController: UIViewController {
         return Filters.todayTrackers
     }
     
-    private func createPreview(for view: UIView) -> UIViewController {
-        let previewController = UIViewController()
-        previewController.preferredContentSize = view.frame.size
-        guard let previewView = view.snapshotView(afterScreenUpdates: true)  else { return UIViewController() }
-        previewView.frame = CGRect(origin: .zero, size: view.frame.size)
-        previewView.layer.cornerRadius = view.layer.cornerRadius
-        previewView.layer.masksToBounds = view.layer.masksToBounds
-        
-        for subview in view.subviews {
-            let subviewCopy = subview.snapshotView(afterScreenUpdates: true)!
-            subviewCopy.frame = subview.frame
-            previewView.addSubview(subviewCopy)
-        }
-        previewController.view.addSubview(previewView)
-        return previewController
+    private func showEditingViewController(selectedTracker: Tracker, categoryTitle: String, daysCounter: String) {
+        self.viewModel.editButtonTapped()
+        let trackerEditViewController = NewHabitOrEventViewController()
+        trackerEditViewController.eventMode = selectedTracker.dateEvent != nil
+        trackerEditViewController.categoryTitle = categoryTitle
+        trackerEditViewController.editingTracker = selectedTracker
+        trackerEditViewController.daysCounter = daysCounter
+        trackerEditViewController.editingDelegate = self
+        let navVC = UINavigationController(rootViewController: trackerEditViewController)
+        self.present(navVC, animated: true)
     }
     
-    func showAlert(for selectedTracker: Tracker) {
+    private func showAlert(for selectedTracker: Tracker) {
         let alert = UIAlertController(title: nil, message: "delete.confirmation".localized, preferredStyle: .actionSheet)
         let deleteAction = UIAlertAction(title: "delete".localized, style: .destructive) { [weak self] _ in
             guard let self = self else { return }
-            self.viewModel?.deleteTracker(selectedTracker)
+            self.viewModel.deleteTracker(selectedTracker)
             self.checkTrackersIsEmpty()
             self.reloadVisibleCategories(text: "", date: self.currentDate)
         }
@@ -324,7 +324,7 @@ final class TrackersViewController: UIViewController {
     }
     
     @objc private func addTask() {
-        viewModel?.addButtonTapped()
+        viewModel.addButtonTapped()
         let createTrackerVC = CreateTrackerViewController()
         createTrackerVC.delegate = self
         let navVC = UINavigationController(rootViewController: createTrackerVC)
@@ -332,7 +332,7 @@ final class TrackersViewController: UIViewController {
     }
     
     @objc private func filterButtonTapped() {
-        viewModel?.filterButtonTapped()
+        viewModel.filterButtonTapped()
         let filtersVC = FiltersViewController()
         filtersVC.delegate = self
         filtersVC.selectedFilter = self.savedFilter
@@ -344,11 +344,11 @@ final class TrackersViewController: UIViewController {
 extension TrackersViewController: UICollectionViewDataSource {
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return viewModel?.categories.count ?? 0
+        return viewModel.categories.count
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return viewModel?.categories[section].trackers.count ?? 0
+        return viewModel.categories[section].trackers.count
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
@@ -363,8 +363,8 @@ extension TrackersViewController: UICollectionViewDataSource {
         let category = visibleCategories[indexPath.section]
         let tracker = category.trackers[indexPath.row]
         cell.delegate = self
-        let completedDays = viewModel?.completedDays(for: tracker.id)
-        cell.configure(with: tracker, category: category.title, isCompletedToday: completedDays?.completed ?? false, completedDays: completedDays?.number ?? 0, indexPath: indexPath)
+        let completedDays = viewModel.completedDays(for: tracker.id)
+        cell.configure(with: tracker, category: category.title, isCompletedToday: completedDays.completed, completedDays: completedDays.number , indexPath: indexPath)
         return cell
     }
 }
@@ -388,37 +388,32 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
         guard let selectedIndexPath = indexPaths.first else { return nil }
         let selectedTrackerCategory = visibleCategories[selectedIndexPath.section]
         let selectedTracker = selectedTrackerCategory.trackers[selectedIndexPath.item]
-        let cell = collectionView.cellForItem(at: indexPaths[0]) as! TrackerCell
+        let cell = collectionView.cellForItem(at: indexPaths[0]) as? TrackerCell
         
-        let configuration = UIContextMenuConfiguration(identifier: nil, previewProvider: {
-            return self.createPreview(for: cell.mainView)
-        }) { _ in
+        return UIContextMenuConfiguration(actionProvider:  { _ in
             let title = selectedTrackerCategory.title == "Закрепленные" ? "unpin".localized : "pin".localized
             let pinAction = UIAction(title: title, image: nil) { [weak self] _ in
                 guard let self = self else { return }
-                self.viewModel?.togglePin(selectedTracker)
+                self.viewModel.togglePin(selectedTracker)
                 self.checkTrackersIsEmpty()
                 self.reloadVisibleCategories(text: "", date: self.currentDate)
             }
             let editAction = UIAction(title: "edit".localized, image: nil) { [weak self] _ in
                 guard let self = self else { return }
-                self.viewModel?.editButtonTapped()
-                let trackerEditViewController = NewHabitOrEventViewController()
-                trackerEditViewController.eventMode = selectedTracker.dateEvent != nil
-                trackerEditViewController.categoryTitle = selectedTrackerCategory.title
-                trackerEditViewController.editingTracker = selectedTracker
-                trackerEditViewController.daysCounter = cell.counterLabel.text
-                trackerEditViewController.editingDelegate = self
-                let navVC = UINavigationController(rootViewController: trackerEditViewController)
-                self.present(navVC, animated: true)
+                self.showEditingViewController(selectedTracker: selectedTracker, categoryTitle: selectedTrackerCategory.title, daysCounter: cell?.counterLabel.text ?? "")
             }
             let deleteAction = UIAction(title: "delete".localized, image: nil, attributes: .destructive) { [weak self] _ in
                 guard let self = self else { return }
                 self.showAlert(for: selectedTracker)
             }
             return UIMenu(title: "", children: [pinAction, editAction, deleteAction])
-        }
-        return configuration
+        })
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfiguration configuration: UIContextMenuConfiguration, highlightPreviewForItemAt indexPath: IndexPath) -> UITargetedPreview? {
+        guard let cell = collectionView.cellForItem(at: indexPath) as? TrackerCell else { return nil }
+        let targetPreview = UITargetedPreview(view: cell.mainView)
+        return targetPreview
     }
 }
 
@@ -434,7 +429,7 @@ extension TrackersViewController: UITextFieldDelegate {
 // MARK: - Extension TrackerCellDelegate
 extension TrackersViewController: TrackerCellDelegate {
     func completeTracker(id: UUID, at indexPath: IndexPath) {
-        viewModel?.completeTracker(id: id, date: currentDate)
+        viewModel.completeTracker(id: id, date: currentDate)
         self.reloadVisibleCategories(text: "", date: currentDate)
     }
 }
@@ -443,7 +438,7 @@ extension TrackersViewController: TrackerCellDelegate {
 extension TrackersViewController: CreateTrackerViewControllerDelegate, NewHabitOrEventViewControllerDelegate {
     func addNewTracker(newTracker: TrackerCategory) {
         let trackerOrEvent = addDateForEvent(newTracker: newTracker)
-        viewModel?.addNewTracker(trackerOrEvent.trackers[0], with: trackerOrEvent)
+        viewModel.addNewTracker(trackerOrEvent.trackers[0], with: trackerOrEvent)
         self.trackersIsEmpty = visibleCategories.isEmpty
     }
     

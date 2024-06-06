@@ -35,6 +35,7 @@
 		5DAA6C3A2C0A79AD00917093 /* TrackerForStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAA6C392C0A79AD00917093 /* TrackerForStatistics.swift */; };
 		5DAA6C422C0CCA8700917093 /* TrackerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAA6C412C0CCA8700917093 /* TrackerTests.swift */; };
 		5DC1BE282C0E7FD1006ED47E /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DC1BE272C0E7FD1006ED47E /* AnalyticsService.swift */; };
+		5DC1BE2B2C124CA7006ED47E /* FiltersCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DC1BE2A2C124CA7006ED47E /* FiltersCell.swift */; };
 		5DC39B9B2BA770F500F6CDB7 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DC39B9A2BA770F500F6CDB7 /* TabBarController.swift */; };
 		5DC39B9D2BA771F000F6CDB7 /* StatisticsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DC39B9C2BA771F000F6CDB7 /* StatisticsViewController.swift */; };
 		5DC39C0E2BB5F8EE00F6CDB7 /* Tracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DC39C0D2BB5F8EE00F6CDB7 /* Tracker.swift */; };
@@ -95,6 +96,7 @@
 		5DAA6C3F2C0CCA8600917093 /* TrackerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrackerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5DAA6C412C0CCA8700917093 /* TrackerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerTests.swift; sourceTree = "<group>"; };
 		5DC1BE272C0E7FD1006ED47E /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
+		5DC1BE2A2C124CA7006ED47E /* FiltersCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiltersCell.swift; sourceTree = "<group>"; };
 		5DC39B9A2BA770F500F6CDB7 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 		5DC39B9C2BA771F000F6CDB7 /* StatisticsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsViewController.swift; sourceTree = "<group>"; };
 		5DC39C0D2BB5F8EE00F6CDB7 /* Tracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tracker.swift; sourceTree = "<group>"; };
@@ -166,7 +168,7 @@
 			children = (
 				5DC39B9C2BA771F000F6CDB7 /* StatisticsViewController.swift */,
 				5D267B492BBB93340011457C /* TrackersViewController */,
-				5DAA6C352C038E9D00917093 /* FiltersViewController.swift */,
+				5DC1BE292C124BFB006ED47E /* FiltersViewController */,
 				5DC39C172BB8D23B00F6CDB7 /* CreateTrackerViewController.swift */,
 				5D7732182BBCF01800E3476D /* NewHabitOrEventViewController */,
 			);
@@ -238,6 +240,15 @@
 				5DAA6C412C0CCA8700917093 /* TrackerTests.swift */,
 			);
 			path = TrackerTests;
+			sourceTree = "<group>";
+		};
+		5DC1BE292C124BFB006ED47E /* FiltersViewController */ = {
+			isa = PBXGroup;
+			children = (
+				5DAA6C352C038E9D00917093 /* FiltersViewController.swift */,
+				5DC1BE2A2C124CA7006ED47E /* FiltersCell.swift */,
+			);
+			path = FiltersViewController;
 			sourceTree = "<group>";
 		};
 		5DC39B992BA770E000F6CDB7 /* TabBarController */ = {
@@ -514,6 +525,7 @@
 				5DC39C162BB876F200F6CDB7 /* TrackerCell.swift in Sources */,
 				5D267B482BBB701A0011457C /* ScheduleViewController.swift in Sources */,
 				5D7AC1E92BD327D8001027D9 /* DateWithoutTime.swift in Sources */,
+				5DC1BE2B2C124CA7006ED47E /* FiltersCell.swift in Sources */,
 				5D7AC1792BBF89E8001027D9 /* IntForDays.swift in Sources */,
 				5DC39B9D2BA771F000F6CDB7 /* StatisticsViewController.swift in Sources */,
 				5D267B4C2BBC699B0011457C /* TrackerPropertiesCell.swift in Sources */,
