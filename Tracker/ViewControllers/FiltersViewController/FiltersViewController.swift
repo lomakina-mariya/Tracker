@@ -80,6 +80,7 @@ extension FiltersViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         cell.backgroundColor = .ypLightGray.withAlphaComponent(0.3)
+        cell.selectionStyle = .none
         cell.textLabel?.text = filtersArray[indexPath.row].rawValue.localized
         cell.accessoryView = nil
         if filtersArray[indexPath.row] == selectedFilter {

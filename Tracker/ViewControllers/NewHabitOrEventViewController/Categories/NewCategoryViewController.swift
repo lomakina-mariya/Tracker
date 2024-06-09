@@ -52,6 +52,7 @@ final class NewCategoryViewController: UIViewController {
         addElements()
         createNavigationBar()
         setupConstraints()
+        addTapGestureToHideKeyboard()
     }
     
     //MARK: - Private Function

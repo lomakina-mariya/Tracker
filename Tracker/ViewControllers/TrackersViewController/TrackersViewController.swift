@@ -35,6 +35,7 @@ final class TrackersViewController: UIViewController {
             conditionStubs()
         }
     }
+    private var haveTrackersForToday = false
     private var viewModel: TrackersViewModel
     private var visibleCategories: [TrackerCategory] {
         return viewModel.categories
@@ -141,13 +142,12 @@ final class TrackersViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .ypWhite
         
-        viewModel = TrackersViewModel()
+        trackersIsEmpty = visibleCategories.isEmpty
         viewModel.categoriesBinding = { [weak self] _ in
             guard let self = self else { return }
             self.reloadPlaceholder()
             self.trackersCollectionView.reloadData()
         }
-        trackersIsEmpty = visibleCategories.isEmpty
         trackersCollectionView.delegate = self
         trackersCollectionView.dataSource = self
         addElements()
@@ -191,12 +191,12 @@ final class TrackersViewController: UIViewController {
             notFoundLabel.isHidden = false
             stubLabel.isHidden = true
             stubImageView.isHidden = true
-            filterButton.isHidden = true
         } else {
             notFoundImageView.isHidden = true
             notFoundLabel.isHidden = true
-            filterButton.isHidden = false
         }
+        haveTrackersForToday = checkTrackersForToday()
+        filterButton.isHidden = !haveTrackersForToday
     }
     
     private func setupConstraints() {
@@ -271,12 +271,15 @@ final class TrackersViewController: UIViewController {
     }
     
     private func reloadVisibleCategories(text: String?, date: Date) {
-        viewModel.updateStore(with: date, text: text ?? "", completedFilter: self.completedFilter)
+        viewModel.updateCategories(with: date, text: text ?? "", completedFilter: self.completedFilter)
     }
     
-    private func checkTrackersIsEmpty() {
-        viewModel.updateStore(with: Date.distantPast, text: "", completedFilter: nil)
-        self.trackersIsEmpty = viewModel.categories.isEmpty
+    private func checkStoreIsEmpty() {
+        self.trackersIsEmpty = !viewModel.haveTrackers(for: Date.distantPast)
+    }
+    
+    private func checkTrackersForToday() -> Bool {
+        return viewModel.haveTrackers(for: currentDate)
     }
     
     private func loadFilter() -> Filters {
@@ -284,7 +287,7 @@ final class TrackersViewController: UIViewController {
            let savedFilter = Filters(rawValue: savedFilterString) {
             return savedFilter
         }
-        return Filters.todayTrackers
+        return Filters.allTrackers
     }
     
     private func showEditingViewController(selectedTracker: Tracker, categoryTitle: String, daysCounter: String) {
@@ -304,7 +307,7 @@ final class TrackersViewController: UIViewController {
         let deleteAction = UIAlertAction(title: "delete".localized, style: .destructive) { [weak self] _ in
             guard let self = self else { return }
             self.viewModel.deleteTracker(selectedTracker)
-            self.checkTrackersIsEmpty()
+            self.checkStoreIsEmpty()
             self.reloadVisibleCategories(text: "", date: self.currentDate)
         }
     
@@ -395,8 +398,7 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
             let pinAction = UIAction(title: title, image: nil) { [weak self] _ in
                 guard let self = self else { return }
                 self.viewModel.togglePin(selectedTracker)
-                self.checkTrackersIsEmpty()
-                self.reloadVisibleCategories(text: "", date: self.currentDate)
+                //self.reloadVisibleCategories(text: "", date: self.currentDate)
             }
             let editAction = UIAction(title: "edit".localized, image: nil) { [weak self] _ in
                 guard let self = self else { return }
@@ -439,7 +441,8 @@ extension TrackersViewController: CreateTrackerViewControllerDelegate, NewHabitO
     func addNewTracker(newTracker: TrackerCategory) {
         let trackerOrEvent = addDateForEvent(newTracker: newTracker)
         viewModel.addNewTracker(trackerOrEvent.trackers[0], with: trackerOrEvent)
-        self.trackersIsEmpty = visibleCategories.isEmpty
+        self.reloadVisibleCategories(text: "", date: currentDate)
+        checkStoreIsEmpty()
     }
     
     private func addDateForEvent(newTracker: TrackerCategory) -> TrackerCategory {

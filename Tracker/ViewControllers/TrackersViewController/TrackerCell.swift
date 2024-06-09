@@ -120,7 +120,7 @@ final class TrackerCell: UICollectionViewCell {
         mainView.addSubview(emojiLabel)
         contentView.addSubview(plusButton)
         contentView.addSubview(counterLabel)
-        contentView.addSubview(pinImageView)
+        mainView.addSubview(pinImageView)
     }
     
     private func setupConstraints() {
@@ -149,8 +149,8 @@ final class TrackerCell: UICollectionViewCell {
             counterLabel.widthAnchor.constraint(equalToConstant: 101),
             counterLabel.heightAnchor.constraint(equalToConstant: 18),
             
-            pinImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -4),
-            pinImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
+            pinImageView.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -4),
+            pinImageView.topAnchor.constraint(equalTo: mainView.topAnchor, constant: 12),
             pinImageView.widthAnchor.constraint(equalToConstant: 24),
             pinImageView.heightAnchor.constraint(equalToConstant: 24)
         ])

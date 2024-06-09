@@ -11,6 +11,7 @@
 		5D267B462BBB30A00011457C /* NewHabitOrEventViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D267B452BBB30A00011457C /* NewHabitOrEventViewController.swift */; };
 		5D267B482BBB701A0011457C /* ScheduleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D267B472BBB701A0011457C /* ScheduleViewController.swift */; };
 		5D267B4C2BBC699B0011457C /* TrackerPropertiesCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D267B4B2BBC699B0011457C /* TrackerPropertiesCell.swift */; };
+		5D5C248E2C151D4D00298EC9 /* TrackerCategoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D5C248D2C151D4D00298EC9 /* TrackerCategoryStore.swift */; };
 		5D77BA062C0CD52400528A3A /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 5D77BA052C0CD52400528A3A /* SnapshotTesting */; };
 		5D77BA192C0D17A600528A3A /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5D77BA1B2C0D17A600528A3A /* Localizable.strings */; };
 		5D77BA1E2C0D225900528A3A /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D77BA1D2C0D225900528A3A /* String.swift */; };
@@ -71,6 +72,7 @@
 		5D267B452BBB30A00011457C /* NewHabitOrEventViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewHabitOrEventViewController.swift; sourceTree = "<group>"; };
 		5D267B472BBB701A0011457C /* ScheduleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleViewController.swift; sourceTree = "<group>"; };
 		5D267B4B2BBC699B0011457C /* TrackerPropertiesCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerPropertiesCell.swift; sourceTree = "<group>"; };
+		5D5C248D2C151D4D00298EC9 /* TrackerCategoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCategoryStore.swift; sourceTree = "<group>"; };
 		5D77BA1A2C0D17A600528A3A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		5D77BA1C2C0D17B200528A3A /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		5D77BA1D2C0D225900528A3A /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
@@ -211,6 +213,7 @@
 			isa = PBXGroup;
 			children = (
 				5D7AC1E12BCDB590001027D9 /* TrackerStore.swift */,
+				5D5C248D2C151D4D00298EC9 /* TrackerCategoryStore.swift */,
 				5D7AC1E62BD1EE17001027D9 /* TrackerRecordStore.swift */,
 			);
 			path = Store;
@@ -524,6 +527,7 @@
 				5D7AC23E2BE1935E001027D9 /* PageViewController.swift in Sources */,
 				5DC39C162BB876F200F6CDB7 /* TrackerCell.swift in Sources */,
 				5D267B482BBB701A0011457C /* ScheduleViewController.swift in Sources */,
+				5D5C248E2C151D4D00298EC9 /* TrackerCategoryStore.swift in Sources */,
 				5D7AC1E92BD327D8001027D9 /* DateWithoutTime.swift in Sources */,
 				5DC1BE2B2C124CA7006ED47E /* FiltersCell.swift in Sources */,
 				5D7AC1792BBF89E8001027D9 /* IntForDays.swift in Sources */,

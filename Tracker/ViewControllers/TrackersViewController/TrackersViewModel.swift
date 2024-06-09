@@ -29,11 +29,19 @@ final class TrackersViewModel {
         return trackerStore.trackersCategories
     }
     
-    func updateStore(with date: Date, text: String, completedFilter: Bool?) {
+    func updateCategories(with date: Date, text: String, completedFilter: Bool?) {
         currentDate = date
         self.text = text
         trackerStore.update(with: currentDate, text: self.text, completedFilter: completedFilter)
         categories = getTrackersFromStore()
+    }
+    
+    func haveTrackers(for date: Date) -> Bool {
+        do {
+            return try trackerStore.haveTrackers(for: date)
+        } catch {
+            return false
+        }
     }
     
     func completedDays(for id: UUID) -> (number: Int, completed: Bool) {
@@ -89,7 +97,7 @@ final class TrackersViewModel {
 // MARK: - TrackerStoreDelegate
 extension TrackersViewModel: TrackerStoreDelegate {
     func didUpdate() {
-        updateStore(with: currentDate, text: text, completedFilter: self.completedFilter)
+        updateCategories(with: currentDate, text: text, completedFilter: self.completedFilter)
     }
 }
 

@@ -1,6 +1,6 @@
+import CoreData
 import Foundation
 import UIKit
-import CoreData
 
 enum TrackerCategoryStoreError: Error {
     case decodingErrorInvalidCategory
@@ -91,27 +91,30 @@ final class TrackerStore: NSObject {
     // MARK: - Private Function
     
     private func createPredicate() -> NSPredicate {
-        guard date != Date.distantPast else { return NSPredicate(value: true) }
-        let calendar = Calendar.current
-        let weekdayNumber = calendar.component(.weekday, from: date)
-        let filterWeekday = Weekdays.fromNumberValue(weekdayNumber)
-        let weekdayPredicate = NSPredicate(format: "%K CONTAINS[c] %@", #keyPath(TrackerCoreData.schedule), filterWeekday)
-        let datePredicate = NSPredicate(format: "%K == %@", #keyPath(TrackerCoreData.dateEvent), date as CVarArg)
-        var finalPredicate = NSCompoundPredicate(type: .or, subpredicates: [datePredicate, weekdayPredicate])
-        
+        var finalPredicate = createDatePredicate()
         if completedFilter != nil {
             let filterPredicate = completedFilter! ?
             NSPredicate(format: "SUBQUERY(record, $record, $record.date == %@).@count > 0", date as CVarArg) :
             NSPredicate(format: "SUBQUERY(record, $record, $record.date == %@).@count == 0", date as CVarArg)
             finalPredicate = NSCompoundPredicate(type: .and, subpredicates: [filterPredicate, finalPredicate])
         }
-        
         if text != "" {
             let textPredicate = NSPredicate(format: "%K CONTAINS[c] %@", #keyPath(TrackerCoreData.name), text)
             finalPredicate = NSCompoundPredicate(type: .and, subpredicates: [textPredicate, finalPredicate])
         }
         return finalPredicate
     }
+    
+    private func createDatePredicate() -> NSPredicate {
+        guard date != Date.distantPast else { return NSPredicate(value: true) }
+        let calendar = Calendar.current
+        let weekdayNumber = calendar.component(.weekday, from: date)
+        let filterWeekday = Weekdays.fromNumberValue(weekdayNumber)
+        let weekdayPredicate = NSPredicate(format: "%K CONTAINS[c] %@", #keyPath(TrackerCoreData.schedule), filterWeekday)
+        let datePredicate = NSPredicate(format: "%K == %@", #keyPath(TrackerCoreData.dateEvent), date as CVarArg)
+        return NSCompoundPredicate(type: .or, subpredicates: [datePredicate, weekdayPredicate])
+    }
+        
     
     private func createFetchedResultsController() -> NSFetchedResultsController<TrackerCoreData>? {
         let fetchRequest = TrackerCoreData.fetchRequest()
@@ -132,7 +135,7 @@ final class TrackerStore: NSObject {
         return controller
     }
     
-    private func createNewTracker(_ trackerCoreData: TrackerCoreData, with tracker: Tracker) {
+    private func createOrUpdateTracker(_ trackerCoreData: TrackerCoreData, with tracker: Tracker) {
         let scheduleString = tracker.schedule.compactMap { $0?.rawValue }.joined(separator: ",")
         trackerCoreData.id = tracker.id
         trackerCoreData.name = tracker.name
@@ -140,7 +143,7 @@ final class TrackerStore: NSObject {
         trackerCoreData.emoji = tracker.emoji
         trackerCoreData.schedule = scheduleString
         trackerCoreData.dateEvent = tracker.dateEvent
-        trackerCoreData.isPinned = false
+        trackerCoreData.isPinned = trackerCoreData.isPinned
     }
     
     private func fetchCategory(with title: String) throws -> TrackerCategoryCoreData? {
@@ -173,9 +176,8 @@ final class TrackerStore: NSObject {
     }
     
     func addNewTracker(_ tracker: Tracker, with category: TrackerCategory) throws {
-        try deleteTracker(tracker)
-        let trackerCoreData = TrackerCoreData(context: context)
-        createNewTracker(trackerCoreData, with: tracker)
+        let trackerCoreData = try fetchTracker(by: tracker.id)
+        createOrUpdateTracker(trackerCoreData, with: tracker)
         
         if let existingCategory = try fetchCategory(with: category.title) {
             existingCategory.addToTracker(trackerCoreData)
@@ -184,19 +186,43 @@ final class TrackerStore: NSObject {
             newCategory.title = category.title
             newCategory.addToTracker(trackerCoreData)
         }
-        try context.save()
+        do {
+            try context.save()
+        } catch {
+            print("Ошибка при сохранении объекта: \(error)")
+        }
     }
     
     func deleteTracker(_ tracker: Tracker) throws {
-        let trackerCoreData = try fetchTracker(by: tracker.id)
-        context.delete(trackerCoreData)
-        try context.save()
+        do {
+            let trackerCoreData = try fetchTracker(by: tracker.id)
+            if let records = trackerCoreData.record as? Set<TrackerRecordCoreData> {
+                for record in records {
+                    context.delete(record)
+                }
+            }
+            context.delete(trackerCoreData)
+            try context.save()
+            
+        } catch {
+            throw error
+        }
     }
     
     func togglePin(_ tracker: Tracker) throws {
         let trackerCoreData = try fetchTracker(by: tracker.id)
         trackerCoreData.isPinned.toggle()
         try context.save()
+    }
+    
+    func haveTrackers(for date: Date) throws -> Bool {
+        self.date = date
+        let fetchRequest = NSFetchRequest<NSNumber>(entityName: "TrackerCoreData")
+        fetchRequest.resultType = .countResultType
+        fetchRequest.predicate = createDatePredicate()
+        
+        let result = try context.fetch(fetchRequest)
+        return (result.first?.intValue ?? 0) > 0
     }
 }
 

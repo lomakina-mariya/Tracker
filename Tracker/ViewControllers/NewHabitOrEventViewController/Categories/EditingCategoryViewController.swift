@@ -3,7 +3,7 @@ import Foundation
 import UIKit
 
 protocol EditingCategoryViewControllerDelegate: AnyObject {
-    func saveEditingCategory(editingCategory: String)
+    func saveEditingCategory(editingCategory: String, newName: String)
 }
 
 final class EditingCategoryViewController: UIViewController {
@@ -41,6 +41,7 @@ final class EditingCategoryViewController: UIViewController {
     
     //MARK: - Properties
     var editingCategory = ""
+    var newCategory = ""
     weak var delegate: EditingCategoryViewControllerDelegate?
     
     // MARK: - Life Cycle
@@ -52,6 +53,7 @@ final class EditingCategoryViewController: UIViewController {
         addElements()
         createNavigationBar()
         setupConstraints()
+        addTapGestureToHideKeyboard()
     }
     
     //MARK: - Private Function
@@ -82,7 +84,7 @@ final class EditingCategoryViewController: UIViewController {
     //MARK: - @objc Function
     
     @objc private func saveEditingCategoryButtonTapped() {
-        delegate?.saveEditingCategory(editingCategory: editingCategory)
+        delegate?.saveEditingCategory(editingCategory: editingCategory, newName: newCategory)
         dismiss(animated: true, completion: nil)
     }
 }
@@ -96,7 +98,7 @@ extension EditingCategoryViewController: UITextFieldDelegate {
         let isNameFilled = !newText.isEmpty
         saveCategoryButton.isEnabled = isNameFilled
         saveCategoryButton.backgroundColor = isNameFilled ? .ypBlack : .ypGray
-        editingCategory = newText
+        newCategory = newText
     }
 }
 

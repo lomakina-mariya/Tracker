@@ -1,7 +1,7 @@
 
+import CoreData
 import Foundation
 import UIKit
-import CoreData
 
 final class TrackerRecordStore: NSObject {
     private let context: NSManagedObjectContext
