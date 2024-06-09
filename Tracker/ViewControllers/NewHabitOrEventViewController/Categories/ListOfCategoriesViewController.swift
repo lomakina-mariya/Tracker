@@ -29,7 +29,7 @@ final class ListOfCategoriesViewController: UIViewController {
     
     private lazy var stubLabel: UILabel = {
         let label = UILabel()
-        label.text = "Привычки и события можно объединить по смыслу"
+        label.text = "categoryStubLabel".localized
         label.font = .systemFont(ofSize: 12, weight: .medium)
         label.numberOfLines = 2
         label.textAlignment = .center
@@ -41,8 +41,8 @@ final class ListOfCategoriesViewController: UIViewController {
     private  lazy var addCategoryButton: UIButton = {
         let button = UIButton()
         button.backgroundColor = .ypBlack
-        button.setTitle("Добавить категорию", for: .normal)
-        button.tintColor = .ypWhite
+        button.setTitle("buttonAddCategory".localized, for: .normal)
+        button.setTitleColor(.ypWhite, for: .normal)
         button.titleLabel?.textAlignment = .center
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.clipsToBounds = true
@@ -53,6 +53,7 @@ final class ListOfCategoriesViewController: UIViewController {
     }()
     
     //MARK: - Properties
+    private let trackerCategoryStore = TrackerCategoryStore()
     private var categoriesArray: [String] = []
     var selectedCategory: String?
     private var selectedIndexPath: IndexPath?
@@ -64,7 +65,7 @@ final class ListOfCategoriesViewController: UIViewController {
         super.viewDidLoad()
         
         view.backgroundColor = .ypWhite
-        categoriesArray = UserDefaults.standard.array(forKey: "categoriesArray") as? [String] ?? []
+        categoriesArray = trackerCategoryStore.fetchAllCategory()
         listTableView.dataSource = self
         listTableView.delegate = self
         addElements()
@@ -105,7 +106,7 @@ final class ListOfCategoriesViewController: UIViewController {
     
     private func createNavigationBar() {
         guard let navigationBar = navigationController?.navigationBar else { return }
-        navigationBar.topItem?.title = "Категория"
+        navigationBar.topItem?.title = "categoryTitle".localized
     }
     
     private func conditionStubs() {
@@ -166,6 +167,7 @@ extension ListOfCategoriesViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+        cell.selectionStyle = .none
         cell.backgroundColor = .ypLightGray.withAlphaComponent(0.3)
         cell.textLabel?.text = categoriesArray[indexPath.row]
         cell.accessoryView = nil
@@ -185,7 +187,6 @@ extension ListOfCategoriesViewController: UITableViewDataSource {
 // MARK: - Extension UITableViewDelegate
 extension ListOfCategoriesViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        //tableView.deselectRow(at: indexPath, animated: true)
         
         if let selectedIndexPath = selectedIndexPath, selectedIndexPath == indexPath {
             tableView.cellForRow(at: indexPath)?.accessoryView = nil
@@ -207,20 +208,25 @@ extension ListOfCategoriesViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        let category = categoriesArray[indexPath.row]
         let configuration = UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
-            let editAction = UIAction(title: "Редактировать", image: nil) { [weak self] _ in
+            let editAction = UIAction(title: "edit".localized, image: nil) { [weak self] _ in
                 guard let self = self else { return }
                 self.editingIndex = indexPath.row
                 let editingCategoryVC = EditingCategoryViewController()
                 editingCategoryVC.delegate = self
-                editingCategoryVC.editingCategory = self.categoriesArray[indexPath.row]
+                editingCategoryVC.editingCategory = category
                 let navVC = UINavigationController(rootViewController: editingCategoryVC)
                 self.present(navVC, animated: true)
             }
-            let deleteAction = UIAction(title: "Удалить", image: nil, attributes: .destructive) { [weak self] _ in
+            let deleteAction = UIAction(title: "delete".localized, image: nil, attributes: .destructive) { [weak self] _ in
                 guard let self = self else { return }
                 self.categoriesArray.remove(at: indexPath.row)
-                UserDefaults.standard.set(self.categoriesArray, forKey: "categoriesArray")
+                do {
+                    try self.trackerCategoryStore.deleteCategory(title: category)
+                } catch {
+                    print("Невозможно удалить категорию")
+                }
                 if let selectedIndexPath = self.selectedIndexPath, selectedIndexPath == indexPath {
                     self.selectedIndexPath = nil
                     self.selectedCategory = nil
@@ -243,7 +249,7 @@ extension ListOfCategoriesViewController: UITableViewDelegate {
 extension ListOfCategoriesViewController: NewCategoryViewControllerDelegate {
     func addNewCategory(newCategory: String) {
         categoriesArray.append(newCategory)
-        UserDefaults.standard.set(categoriesArray, forKey: "categoriesArray")
+        //UserDefaults.standard.set(categoriesArray, forKey: "categoriesArray")
         selectedCategory = newCategory
         selectedIndexPath = IndexPath(row: categoriesArray.count - 1, section: 0)
         self.conditionStubs()
@@ -253,11 +259,11 @@ extension ListOfCategoriesViewController: NewCategoryViewControllerDelegate {
 
 // MARK: - Extension EditingCategoryViewControllerDelegate
 extension ListOfCategoriesViewController: EditingCategoryViewControllerDelegate {
-    func saveEditingCategory(editingCategory: String) {
+    func saveEditingCategory(editingCategory: String, newName: String) {
         guard let editingIndex = editingIndex else { return }
-        categoriesArray[editingIndex] = editingCategory
-        UserDefaults.standard.set(categoriesArray, forKey: "categoriesArray")
-        selectedCategory = editingCategory
+        categoriesArray[editingIndex] = newName
+        try? trackerCategoryStore.updateCategory(withTitle: editingCategory, newName: newName)
+        selectedCategory = newName
         self.updateTableView()
     }
 }

@@ -3,7 +3,7 @@ import Foundation
 import UIKit
 
 protocol CreateTrackerViewControllerDelegate: AnyObject {
-    func addNewTrackers(newTracker: TrackerCategory)
+    func addNewTracker(newTracker: TrackerCategory)
 }
 
 final class CreateTrackerViewController: UIViewController {
@@ -12,9 +12,8 @@ final class CreateTrackerViewController: UIViewController {
     private  lazy var habitButton: UIButton = {
         let button = UIButton()
         button.backgroundColor = .ypBlack
-        button.setTitle("Привычка", for: .normal)
-        button.tintColor = .ypWhite
-        button.titleLabel?.textColor = .ypWhite
+        button.setTitle("buttonНabit.title".localized, for: .normal)
+        button.setTitleColor(.ypWhite, for: .normal)
         button.titleLabel?.textAlignment = .center
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.clipsToBounds = true
@@ -27,9 +26,9 @@ final class CreateTrackerViewController: UIViewController {
     private  lazy var irregularEventsButton: UIButton = {
         let button = UIButton()
         button.backgroundColor = .ypBlack
-        button.setTitle("Нерегулярные событие", for: .normal)
+        button.setTitle("buttonEvent.title".localized, for: .normal)
         button.tintColor = .ypWhite
-        button.titleLabel?.textColor = .ypWhite
+        button.setTitleColor(.ypWhite, for: .normal)
         button.titleLabel?.textAlignment = .center
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.clipsToBounds = true
@@ -75,7 +74,7 @@ final class CreateTrackerViewController: UIViewController {
     
     private func createNavigationBar() {
         guard let navigationBar = navigationController?.navigationBar else { return }
-        navigationBar.topItem?.title = "Создание трекера"
+        navigationBar.topItem?.title = "createTrackers.title".localized
     }
     
     // MARK: - @objc Function
@@ -99,7 +98,7 @@ final class CreateTrackerViewController: UIViewController {
 // MARK: - Extension NewHabitOrEventViewControllerDelegate
 extension CreateTrackerViewController: NewHabitOrEventViewControllerDelegate {
     func addNewTracker(newTracker: TrackerCategory) {
-        delegate?.addNewTrackers(newTracker: newTracker)
+        delegate?.addNewTracker(newTracker: newTracker)
         if let navController = self.navigationController {
             navController.dismiss(animated: true, completion: nil)
             dismiss(animated: true, completion: nil)

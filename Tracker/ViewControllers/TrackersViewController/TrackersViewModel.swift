@@ -7,44 +7,41 @@ final class TrackersViewModel {
     
     private var currentDate = Date().dateWithoutTime()
     private var text = ""
+    private var completedFilter: Bool?
     private var trackerStore = TrackerStore(date: Date.distantPast, text: "")
     private var trackerRecordStore = TrackerRecordStore()
+    private let analyticsService = AnalyticsService()
     private(set) var categories: [TrackerCategory] = [] {
         didSet {
             categoriesBinding?(categories)
         }
     }
     var categoriesBinding: Binding<[TrackerCategory]>?
-    private(set) var isCategoriesEmpty: Bool = false {
-        didSet {
-            isCategoriesEmptyBinding?(isCategoriesEmpty)
-        }
-    }
-    var isCategoriesEmptyBinding: Binding<Bool>?
-    
+
     init() {
         trackerStore.delegate = self
         categories = getTrackersFromStore()
-        isCategoriesEmpty = categories.isEmpty
     }
     
-    // MARK: - Private Function
+    // MARK: - Function
     
     private func getTrackersFromStore() -> [TrackerCategory] {
         return trackerStore.trackersCategories
     }
     
-    private func reloadVisibleCategories(text: String?, date: Date) {
-        trackerStore.update(with: date, text: text)
-    }
-    
-    // MARK: - Internal Function
-    
-    func updateStore(with date: Date, text: String) {
+    func updateCategories(with date: Date, text: String, completedFilter: Bool?) {
         currentDate = date
         self.text = text
-        trackerStore.update(with: currentDate, text: self.text)
+        trackerStore.update(with: currentDate, text: self.text, completedFilter: completedFilter)
         categories = getTrackersFromStore()
+    }
+    
+    func haveTrackers(for date: Date) -> Bool {
+        do {
+            return try trackerStore.haveTrackers(for: date)
+        } catch {
+            return false
+        }
     }
     
     func completedDays(for id: UUID) -> (number: Int, completed: Bool) {
@@ -58,19 +55,49 @@ final class TrackersViewModel {
         try? trackerStore.addNewTracker(tracker, with: category)
     }
     
+    func deleteTracker(_ tracker: Tracker) {
+        analyticsService.report(event: "click", params: ["screen" : "main", "item" : "delete"])
+        try? trackerStore.deleteTracker(tracker)
+    }
+    
     func completeTracker(id: UUID, date: Date) {
+        analyticsService.report(event: "click", params: ["screen" : "main", "item" : "track"])
         do {
             try trackerRecordStore.addOrDeleteRecord(id: id, date: date)
         } catch {
             print("Ошибка сохранения изменения трекера \(error)")
         }
     }
+    
+    func togglePin(_ tracker: Tracker) {
+        try? trackerStore.togglePin(tracker)
+    }
+    
+    func screenOpen() {
+        analyticsService.report(event: "open", params: ["screen" : "main"])
+    }
+    
+    func screenClose() {
+        analyticsService.report(event: "close", params: ["screen" : "main"])
+    }
+    
+    func addButtonTapped() {
+        analyticsService.report(event: "click", params: ["screen" : "main", "item" : "add_track"])
+    }
+    
+    func filterButtonTapped() {
+        analyticsService.report(event: "click", params: ["screen" : "main", "item" : "filter"])
+    }
+    func editButtonTapped() {
+        analyticsService.report(event: "click", params: ["screen" : "main", "item" : "edit"])
+    }
+    
 }
 
 // MARK: - TrackerStoreDelegate
 extension TrackersViewModel: TrackerStoreDelegate {
     func didUpdate() {
-        updateStore(with: currentDate, text: text)
+        updateCategories(with: currentDate, text: text, completedFilter: self.completedFilter)
     }
 }
 

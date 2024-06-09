@@ -38,7 +38,7 @@ final class NewHabitOrEventViewController: UIViewController {
         textField.tintColor = .ypBlack
         textField.font = .systemFont(ofSize: 17, weight: .regular)
         textField.translatesAutoresizingMaskIntoConstraints = false
-        textField.placeholder = "Введите название трекера"
+        textField.placeholder = "createTrackers.placeholder".localized
         textField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: textField.frame.height))
         textField.leftViewMode = .always
         textField.clearButtonMode = .whileEditing
@@ -51,10 +51,21 @@ final class NewHabitOrEventViewController: UIViewController {
     
     private lazy var restrictiveLabel: UILabel = {
         let label = UILabel()
-        label.text = "Ограничение 38 символов"
+        label.text = "restrictiveLabel".localized
         label.textColor = .ypRed
         label.textAlignment = .center
         label.font = .systemFont(ofSize: 17, weight: .regular)
+        label.isHidden = true
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private lazy var counterLabel: UILabel = {
+        let label = UILabel()
+        label.text = "1 день"
+        label.textColor = .ypBlack
+        label.textAlignment = .center
+        label.font = .systemFont(ofSize: 32, weight: .bold)
         label.isHidden = true
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -64,8 +75,8 @@ final class NewHabitOrEventViewController: UIViewController {
         let button = UIButton()
         button.backgroundColor = .ypGray
         button.isEnabled = false
-        button.setTitle("Создать", for: .normal)
-        button.tintColor = .ypWhite
+        button.setTitle("Create".localized, for: .normal)
+        button.setTitleColor(.ypWhite, for: .normal)
         button.titleLabel?.textAlignment = .center
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.clipsToBounds = true
@@ -77,8 +88,8 @@ final class NewHabitOrEventViewController: UIViewController {
     
     private lazy var cancelButton: UIButton = {
         let button = UIButton(type: .system)
-        button.backgroundColor = .white
-        button.setTitle("Отменить", for: .normal)
+        button.backgroundColor = .ypWhite
+        button.setTitle("cancel".localized, for: .normal)
         button.tintColor = .ypRed
         button.layer.borderWidth = 1
         button.layer.borderColor = UIColor.ypRed.cgColor
@@ -119,7 +130,7 @@ final class NewHabitOrEventViewController: UIViewController {
     
     private lazy var colorLabel: UILabel = {
         let label = UILabel()
-        label.text = "Цвет"
+        label.text = "colorLabel".localized
         label.textColor = .ypBlack
         label.font = .systemFont(ofSize: 19, weight: .bold)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -152,7 +163,7 @@ final class NewHabitOrEventViewController: UIViewController {
     
     //MARK: - Properties
     private let colorArray: [UIColor] = [
-        .colorSelection1,
+            .colorSelection1,
             .colorSelection2,
             .colorSelection3,
             .colorSelection4,
@@ -173,12 +184,19 @@ final class NewHabitOrEventViewController: UIViewController {
     ]
     private let emojiArray: [String] = ["🙂", "😻", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝️", "😪"]
     private var isTrackerNameFilled: Bool = false
-    private var categoryTitle = ""
     private var color: UIColor?
     private var emoji: String?
     private var schedule: [Weekdays?] = []
+    private var emojiIndex: IndexPath?
+    private var colorIndex: IndexPath?
+    private var topMargin = 24
     var eventMode: Bool = false
+    var categoryTitle = ""
+    var editingTracker: Tracker?
+    var daysCounter: String?
     weak var delegate: NewHabitOrEventViewControllerDelegate?
+    weak var editingDelegate: NewHabitOrEventViewControllerDelegate?
+    
     
     
     // MARK: - Life Cycle
@@ -188,6 +206,7 @@ final class NewHabitOrEventViewController: UIViewController {
         view.backgroundColor = .ypWhite
         addElements()
         createNavigationBar()
+        checkCounterLabel()
         setupConstraints()
         addTapGestureToHideKeyboard()
         trackerProperties.dataSource = self
@@ -198,6 +217,9 @@ final class NewHabitOrEventViewController: UIViewController {
         colorCollection.delegate = self
         emojiCollection.allowsMultipleSelection = false
         colorCollection.allowsMultipleSelection = false
+        if editingTracker != nil {
+            showEditingTracker()
+        }
     }
     
     // MARK: - Private Function
@@ -213,11 +235,17 @@ final class NewHabitOrEventViewController: UIViewController {
         contentView.addSubview(colorLabel)
         contentView.addSubview(cancelButton)
         contentView.addSubview(createButton)
+        contentView.addSubview(counterLabel)
     }
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            trackerNameInput.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor, constant: 16),
+            counterLabel.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor, constant: 48),
+            counterLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            counterLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            counterLabel.heightAnchor.constraint(equalToConstant: 38),
+            
+            trackerNameInput.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor, constant: CGFloat(topMargin)),
             trackerNameInput.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             trackerNameInput.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             trackerNameInput.heightAnchor.constraint(equalToConstant: 75),
@@ -256,7 +284,7 @@ final class NewHabitOrEventViewController: UIViewController {
             
             colorLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 28),
             colorLabel.topAnchor.constraint(equalTo: emojiCollection.bottomAnchor, constant: 16),
-            colorLabel.widthAnchor.constraint(equalToConstant: 48),
+            colorLabel.widthAnchor.constraint(equalToConstant: 52),
             colorLabel.heightAnchor.constraint(equalToConstant: 18),
             
             colorCollection.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
@@ -279,7 +307,19 @@ final class NewHabitOrEventViewController: UIViewController {
     
     private func createNavigationBar() {
         guard let navigationBar = navigationController?.navigationBar else { return }
-        navigationBar.topItem?.title = eventMode ? "Новое нерегулярное событие" : "Новая привычка"
+        if editingTracker != nil {
+            navigationBar.topItem?.title = "editingTracker.title".localized
+        } else {
+            navigationBar.topItem?.title = eventMode ? "newEvent.title".localized : "newHabit.title".localized
+        }
+    }
+    
+    private func checkCounterLabel() {
+        if daysCounter != nil {
+            counterLabel.isHidden = false
+            counterLabel.text = daysCounter
+            topMargin = 126
+        }
     }
     
     private func checkFullFill() {
@@ -293,6 +333,14 @@ final class NewHabitOrEventViewController: UIViewController {
         createButton.backgroundColor = allFullFill ? .ypBlack : .ypGray
     }
     
+    private func showEditingTracker() {
+        color = colorDictionary[editingTracker?.color ?? "Color selection 17"]
+        emoji = editingTracker?.emoji
+        schedule = editingTracker?.schedule ?? []
+        trackerNameInput.text = editingTracker?.name
+        isTrackerNameFilled = true
+    }
+    
     // MARK: - @objc Function
     @objc private func cancelButtonTapped() {
         dismiss(animated: true, completion: nil)
@@ -300,7 +348,7 @@ final class NewHabitOrEventViewController: UIViewController {
     
     @objc private func createButtonTapped() {
         let newTracker = Tracker(
-            id: UUID(),
+            id: editingTracker != nil ? editingTracker!.id : UUID(),
             name: trackerNameInput.text ?? "",
             color: colorDictionary.first(where: { $0.value == self.color })?.key ?? "Color selection 17",
             emoji: self.emoji ?? "❤️",
@@ -308,7 +356,11 @@ final class NewHabitOrEventViewController: UIViewController {
         let category = TrackerCategory(
             title: self.categoryTitle,
             trackers: [newTracker])
-        delegate?.addNewTracker(newTracker: category)
+        if let delegate = delegate {
+            delegate.addNewTracker(newTracker: category)
+        } else {
+            editingDelegate?.addNewTracker(newTracker: category)
+        }
         dismiss(animated: true, completion: nil)
     }
 }
@@ -330,7 +382,7 @@ extension NewHabitOrEventViewController: UITableViewDataSource {
         }
         cell.configure(indexPath: indexPath)
         if indexPath.row == 1 {
-            let detailsText = schedule.count == 7 ? "Каждый день" : schedule.map { $0!.shortDayName }.joined(separator: ", ")
+            let detailsText = schedule.count == 7 ? "detailsText".localized : schedule.map { $0!.shortDayName.localized }.joined(separator: ", ")
             cell.setup(detailsText: detailsText)
         } else {
             cell.setup(detailsText: categoryTitle)
@@ -425,11 +477,20 @@ extension NewHabitOrEventViewController: UICollectionViewDataSource {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "emojiCell", for: indexPath) as? EmojiCollectionCell else { return UICollectionViewCell() }
             let emoji = emojiArray[indexPath.row]
             cell.configure(emoji: emoji)
+            if emoji == self.emoji {
+                cell.contentView.backgroundColor = .ypLightGray
+                self.emojiIndex = indexPath
+            }
             return cell
         } else {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "colorCell", for: indexPath) as? ColorCollectionCell else { return UICollectionViewCell() }
             let color = colorArray[indexPath.row]
             cell.configure(color: color)
+            cell.contentView.layer.borderColor = color.withAlphaComponent(0.3).cgColor
+            if color == self.color {
+                cell.contentView.layer.borderWidth = 3
+                self.colorIndex = indexPath
+            }
             return cell
         }
     }
@@ -456,11 +517,16 @@ extension NewHabitOrEventViewController: UICollectionViewDelegateFlowLayout {
         let cell = collectionView.cellForItem(at: indexPath)
         if collectionView == emojiCollection {
             emoji = emojiArray[indexPath.row]
+            if indexPath != self.emojiIndex {
+                collectionView.cellForItem(at: emojiIndex ?? indexPath)?.contentView.backgroundColor = .ypWhite
+            }
             cell?.contentView.backgroundColor = .ypLightGray
         } else {
             color = colorArray[indexPath.row]
+            if indexPath != self.colorIndex {
+                collectionView.cellForItem(at: colorIndex ?? indexPath)?.contentView.layer.borderWidth = 0
+            }
             cell?.contentView.layer.borderWidth = 3
-            cell?.contentView.layer.borderColor = color?.withAlphaComponent(0.3).cgColor
         }
         checkFullFill()
     }
@@ -472,9 +538,7 @@ extension NewHabitOrEventViewController: UICollectionViewDelegateFlowLayout {
         } else {
             color = colorArray[indexPath.row]
             cell?.contentView.layer.borderWidth = 0
-            cell?.contentView.layer.borderColor = UIColor.ypGreen.withAlphaComponent(0.3).cgColor
         }
     }
-    
 }
 

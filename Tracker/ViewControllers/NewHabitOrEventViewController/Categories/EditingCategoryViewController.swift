@@ -3,7 +3,7 @@ import Foundation
 import UIKit
 
 protocol EditingCategoryViewControllerDelegate: AnyObject {
-    func saveEditingCategory(editingCategory: String)
+    func saveEditingCategory(editingCategory: String, newName: String)
 }
 
 final class EditingCategoryViewController: UIViewController {
@@ -27,8 +27,8 @@ final class EditingCategoryViewController: UIViewController {
     private  lazy var saveCategoryButton: UIButton = {
         let button = UIButton()
         button.backgroundColor = .ypGray
-        button.setTitle("Готово", for: .normal)
-        button.tintColor = .ypWhite
+        button.setTitle("readyButton.Title".localized, for: .normal)
+        button.setTitleColor(.ypWhite, for: .normal)
         button.titleLabel?.textAlignment = .center
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.clipsToBounds = true
@@ -41,6 +41,7 @@ final class EditingCategoryViewController: UIViewController {
     
     //MARK: - Properties
     var editingCategory = ""
+    var newCategory = ""
     weak var delegate: EditingCategoryViewControllerDelegate?
     
     // MARK: - Life Cycle
@@ -52,6 +53,7 @@ final class EditingCategoryViewController: UIViewController {
         addElements()
         createNavigationBar()
         setupConstraints()
+        addTapGestureToHideKeyboard()
     }
     
     //MARK: - Private Function
@@ -76,13 +78,13 @@ final class EditingCategoryViewController: UIViewController {
     
     private func createNavigationBar() {
         guard let navigationBar = navigationController?.navigationBar else { return }
-        navigationBar.topItem?.title = "Редактирование категории"
+        navigationBar.topItem?.title = "editingCategory.title".localized
     }
     
     //MARK: - @objc Function
     
     @objc private func saveEditingCategoryButtonTapped() {
-        delegate?.saveEditingCategory(editingCategory: editingCategory)
+        delegate?.saveEditingCategory(editingCategory: editingCategory, newName: newCategory)
         dismiss(animated: true, completion: nil)
     }
 }
@@ -96,7 +98,7 @@ extension EditingCategoryViewController: UITextFieldDelegate {
         let isNameFilled = !newText.isEmpty
         saveCategoryButton.isEnabled = isNameFilled
         saveCategoryButton.backgroundColor = isNameFilled ? .ypBlack : .ypGray
-        editingCategory = newText
+        newCategory = newText
     }
 }
 

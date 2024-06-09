@@ -14,7 +14,7 @@ final class NewCategoryViewController: UIViewController {
         textField.tintColor = .ypBlack
         textField.font = .systemFont(ofSize: 17, weight: .regular)
         textField.translatesAutoresizingMaskIntoConstraints = false
-        textField.placeholder = "Введите название категории"
+        textField.placeholder = "inputCategory.placeholder".localized
         textField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: textField.frame.height))
         textField.leftViewMode = .always
         textField.clearButtonMode = .whileEditing
@@ -28,8 +28,8 @@ final class NewCategoryViewController: UIViewController {
     private  lazy var saveCategoryButton: UIButton = {
         let button = UIButton()
         button.backgroundColor = .ypGray
-        button.setTitle("Готово", for: .normal)
-        button.tintColor = .ypWhite
+        button.setTitle("readyButton.Title".localized, for: .normal)
+        button.setTitleColor(.ypWhite, for: .normal)
         button.titleLabel?.textAlignment = .center
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.clipsToBounds = true
@@ -52,6 +52,7 @@ final class NewCategoryViewController: UIViewController {
         addElements()
         createNavigationBar()
         setupConstraints()
+        addTapGestureToHideKeyboard()
     }
     
     //MARK: - Private Function
@@ -76,7 +77,7 @@ final class NewCategoryViewController: UIViewController {
     
     private func createNavigationBar() {
         guard let navigationBar = navigationController?.navigationBar else { return }
-        navigationBar.topItem?.title = "Новая категория"
+        navigationBar.topItem?.title = "newCategory".localized
     }
     
     //MARK: - @objc Function

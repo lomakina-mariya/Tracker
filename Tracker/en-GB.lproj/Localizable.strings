@@ -1,0 +1,13 @@
+/* 
+  Localizable.strings
+  Tracker
+
+  Created by Mariya on 02.06.2024.
+  
+*/
+"trackers.title" = "Трекеры"
+"statistics.title" = "Статистика"
+"emptyState.title" = "Что будем отслеживать?";
+"delete.confirmation" = "Уверены что хотите удалить трекер?";
+"cancel" = "Отменить";
+"edit" = "Редактировать"

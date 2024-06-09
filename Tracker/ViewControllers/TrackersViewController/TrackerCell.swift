@@ -9,9 +9,10 @@ protocol TrackerCellDelegate: AnyObject {
 final class TrackerCell: UICollectionViewCell {
     
     //MARK: - Properties
-    private let mainView: UIView = {
+    private(set) var mainView: UIView = {
         let view = UIView()
         view.layer.cornerRadius = 16
+        view.layer.masksToBounds = true
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -19,7 +20,7 @@ final class TrackerCell: UICollectionViewCell {
     private let taskTitleLabel: UILabel = {
         let label = UILabel()
         label.text = "Уборка"
-        label.textColor = .ypWhite
+        label.textColor = .white
         label.font = .systemFont(ofSize: 12, weight: .medium)
         label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -58,7 +59,15 @@ final class TrackerCell: UICollectionViewCell {
     
     private let doneImage = UIImage(named: "doneImage")
     
-    private let counterLabel: UILabel = {
+    private lazy var pinImageView = {
+        let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 8, height: 12))
+        imageView.image = UIImage(named: "pin")
+        imageView.contentMode = .center
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
+    
+    let counterLabel: UILabel = {
         let label = UILabel()
         label.textColor = .ypBlack
         label.text = "0 дней"
@@ -86,7 +95,7 @@ final class TrackerCell: UICollectionViewCell {
     }
     
     //MARK: - Helper
-    func configure(with tracker: Tracker, isCompletedToday: Bool, completedDays: Int, indexPath: IndexPath) {
+    func configure(with tracker: Tracker, category: String, isCompletedToday: Bool, completedDays: Int, indexPath: IndexPath) {
         self.trackerId = tracker.id
         self.isCompletedToday = isCompletedToday
         self.indexPath = indexPath
@@ -99,17 +108,19 @@ final class TrackerCell: UICollectionViewCell {
         
         let image = isCompletedToday ? doneImage : plusImage
         plusButton.setImage(image, for: .normal)
+        pinImageView.image = category == "Закрепленные" ? UIImage(named: "pin") : .none
         
-        counterLabel.text = completedDays.days()
+        counterLabel.text = completedDays.days().localized
     }
     
     //MARK: - Private Function
     private func addElements() {
         contentView.addSubview(mainView)
-        contentView.addSubview(taskTitleLabel)
-        contentView.addSubview(emojiLabel)
+        mainView.addSubview(taskTitleLabel)
+        mainView.addSubview(emojiLabel)
         contentView.addSubview(plusButton)
         contentView.addSubview(counterLabel)
+        mainView.addSubview(pinImageView)
     }
     
     private func setupConstraints() {
@@ -136,7 +147,12 @@ final class TrackerCell: UICollectionViewCell {
             counterLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
             counterLabel.topAnchor.constraint(equalTo: mainView.bottomAnchor, constant: 16),
             counterLabel.widthAnchor.constraint(equalToConstant: 101),
-            counterLabel.heightAnchor.constraint(equalToConstant: 18)
+            counterLabel.heightAnchor.constraint(equalToConstant: 18),
+            
+            pinImageView.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -4),
+            pinImageView.topAnchor.constraint(equalTo: mainView.topAnchor, constant: 12),
+            pinImageView.widthAnchor.constraint(equalToConstant: 24),
+            pinImageView.heightAnchor.constraint(equalToConstant: 24)
         ])
     }
 
